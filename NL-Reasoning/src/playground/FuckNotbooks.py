@@ -1,18 +1,19 @@
-# %%
+#%%
 
 from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import List, Dict, Callable
-
-# %%
 from graphviz import Digraph
+
+#%%
+
 
 hypo_1 = 'John plays football or chess'
 hypo_2 = 'When it is raining, John plays not football'
 hypo_3 = 'It is raining'
 
 
-# %%
+#%%
 
 def tokenize(sentence: str):
     tokens = sentence.split(" ")
@@ -57,7 +58,7 @@ def detect_sentence_structure(sentence_tokens):
     raise ValueError(f'Sentence structure is not detected: {str(sentence_tokens)}')
 
 
-# %%
+#%%
 
 class Expression:
     def __init__(self, hypothesis):
@@ -178,7 +179,7 @@ class Expression:
         raise NotImplementedError("The rule has not been implemented yet.")
 
 
-# %%
+#%%
 
 exp = Expression(hypo_3)
 print(exp)
@@ -187,7 +188,7 @@ print(exp)
 exp.reverse_expression()
 print(exp)
 
-# %%
+#%%
 
 exp_1 = Expression(hypo_3)
 exp_2 = Expression(hypo_3)
@@ -199,7 +200,7 @@ print(exp_2.is_tautologie_of(exp_2))
 print(exp_1.is_tautologie_of(exp_1))
 
 
-# %%
+#%%
 
 # Assume simple structure for now with a and b ... no a and b or c and d
 # For that we would need to do a binding check or something and convert
@@ -269,21 +270,22 @@ rule_set: Dict[str, Callable[[Expression], Dict[int, Expression]]] = dict(
 )
 
 
-# %%
+#%%
 
-@dataclass(frozen = True)
+@dataclass()
 class AppliedRule:
     rule_name: str = field()
     referenced_line: int = field()
     position: str = field(default = '0', compare = False)
     c_expression: Expression = field(default = None, compare = False, hash = False)
     matched_expression: Expression = field(default = None, compare = False, hash = False)
+    created_expressions: List[Expression] = field(default = None, compare = False, hash = False)
 
     def __lt__(self, other):
         return len(self.position) - len(other.position)
 
 
-# %%
+#%%
 
 class TableauxSolver:
 
@@ -327,7 +329,7 @@ class TableauxSolver:
                     referenced_line = i,
                     position = parent,
                     c_expression = curr_clause,
-                    matched_expression = matched_clause
+                    matched_expression = matched_clause,
                 )
                 self.applied_rules.append(applied_rule)
                 return True
@@ -350,6 +352,7 @@ class TableauxSolver:
                 branches = rule(curr_clause)
 
                 if len(branches) != 0:
+                    applied_rule.created_expressions = branches
                     applied_rules.append(applied_rule)
                     self.applied_rules.append(applied_rule)
                 else:
@@ -379,9 +382,10 @@ class TableauxSolver:
         return False
 
 
-# %%
+#%%
 
 test_exp_1 = Expression(hypo_1)
+test_exp_4 = Expression("Peter plays tennis and badminton")
 test_exp_2 = Expression(hypo_2)
 test_exp_3 = Expression(hypo_3)
 
@@ -390,11 +394,12 @@ clause = Expression("John plays not football")
 print(test_exp_1)
 print(test_exp_2)
 print(test_exp_3)
+print(test_exp_4)
 print(clause)
 
-hypothesis = [test_exp_1, test_exp_2, test_exp_3]
+hypothesis = [test_exp_1, test_exp_2, test_exp_3, test_exp_4]
 
-# %%
+#%%
 
 solver = TableauxSolver(hypothesis, clause)
 result = solver.proof()
