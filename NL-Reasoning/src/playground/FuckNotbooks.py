@@ -276,7 +276,6 @@ rule_set: Dict[str, Callable[[Expression], Dict[int, Expression]]] = dict(
 class AppliedRule:
     rule_name: str = field()
     referenced_line: int = field()
-    position: str = field(default = '0', compare = False)
     c_expression: Expression = field(default = None, compare = False, hash = False)
     matched_expression: Expression = field(default = None, compare = False, hash = False)
     created_expressions: List[Expression] = field(default = None, compare = False, hash = False)
@@ -284,6 +283,33 @@ class AppliedRule:
     def __lt__(self, other):
         return len(self.position) - len(other.position)
 
+#%%
+
+
+import pydot
+
+
+class TreeGenerator:
+
+    def __init__(self, premise):
+        self.graph = pydot.Dot('applied_rules', graph_type = 'graph', bgcolor = 'yellow')
+        self.root_node = pydot.Node('root', label = f'{str(premise)}')
+        self.node_id = 0
+
+    def add_node(self, parent_node, applied_rule):
+        new_nodes = []
+        for new_exp in applied_rule.created_expressions:
+            new_node = pydot.Node(self.node_id, label = f'{str(new_exp)}')
+            self.graph.add_node(new_node)
+
+            my_edge = pydot.Edge(parent_node.get_name(), str(self.node_id), color = 'blue')
+            self.graph.add_edge(my_edge)
+            self.node_id += 1
+            new_nodes.append(new_node)
+        return new_nodes
+
+    def create_file(self):
+        return self.graph.to_string()
 
 #%%
 
@@ -294,6 +320,7 @@ class TableauxSolver:
         self.hypothesis: List[Expression] = hypothesis
         self.thesis: Expression = thesis
         self.applied_rules = []
+        self.solve_tree = None
 
     def proof(self):
         try:
@@ -302,7 +329,8 @@ class TableauxSolver:
                 clauses.append(claus)
             self.thesis.reverse_expression()
             clauses.append(self.thesis)
-            result = self.recursive_proof(clauses, [])
+            self.solve_tree = TreeGenerator(clauses)
+            result = self.recursive_proof(clauses, [], parent = self.solve_tree.root_node)
         except RuntimeError as e:
             print(e)
             raise e
@@ -317,7 +345,7 @@ class TableauxSolver:
                 return True, clause
         return False, None
 
-    def recursive_proof(self, clauses, applied_rules, parent = '0') -> bool:
+    def recursive_proof(self, clauses, applied_rules, parent = None) -> bool:
         # Check if we have a tautology in this branch
         for i, curr_clause in enumerate(clauses):
 
@@ -327,7 +355,6 @@ class TableauxSolver:
                 applied_rule = AppliedRule(
                     rule_name = "tautologie",
                     referenced_line = i,
-                    position = parent,
                     c_expression = curr_clause,
                     matched_expression = matched_clause,
                 )
@@ -343,18 +370,19 @@ class TableauxSolver:
                 applied_rule = AppliedRule(
                     rule_name = rule_name,
                     referenced_line = i,
-                    position = parent,
                     c_expression = curr_clause
                 )
                 if applied_rule in applied_rules:
                     continue
 
                 branches = rule(curr_clause)
+                new_nodes = None
 
                 if len(branches) != 0:
                     applied_rule.created_expressions = branches
                     applied_rules.append(applied_rule)
                     self.applied_rules.append(applied_rule)
+                    new_nodes = self.solve_tree.add_node(parent, applied_rule)
                 else:
                     continue
 
@@ -362,7 +390,7 @@ class TableauxSolver:
                 # the recursive call
                 if len(branches) == 1:
                     clauses += branches[0]  # Not sure if we want to create a copy of the list
-                    return self.recursive_proof(clauses, applied_rules, parent)
+                    return self.recursive_proof(clauses, applied_rules, new_nodes[0])
 
                 # If there is more then one branch we need to close every branch
                 # Go over the list of clauses and create a recursive call for each
@@ -370,8 +398,7 @@ class TableauxSolver:
                 for j, branch in branches.items():
                     next_clauses = list(clauses)
                     next_clauses += branch
-                    next_branch_idx = f'{parent}.{j}'
-                    branch_close = self.recursive_proof(next_clauses, list(applied_rules), next_branch_idx)
+                    branch_close = self.recursive_proof(next_clauses, list(applied_rules), new_nodes[j])
                     if not branch_close:
                         closes = False
 
@@ -406,3 +433,10 @@ result = solver.proof()
 
 for rule in solver.applied_rules:
     print(rule)
+
+#%%
+
+from graphviz import Source
+
+src = Source(solver.solve_tree.create_file())
+src.render('test-output/holy-grenade.gv', view=True)
