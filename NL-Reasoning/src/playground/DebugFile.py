@@ -61,15 +61,22 @@ def detect_sentence_structure(sentence_tokens):
 #%%
 
 class Expression:
+
+    id_counter = 0
+
     def __init__(self, hypothesis):
 
         if hypothesis is None or (type(hypothesis) is not str and type(hypothesis) is not list):
             raise ValueError("A hypothesis needs to be of type string or token list and can't be empty.")
 
+        self.id = Expression.id_counter
+        Expression.id_counter += 1
+
         if type(hypothesis) is str:
             self.init_hypo = hypothesis.lower()  # Only use lower case
             self.tokens: List = tokenize(self.init_hypo)  # Split hypo into tokens
         else:
+            self.init_hypo = " ".join(hypothesis)
             self.tokens = hypothesis
 
         self.split_references()
@@ -149,6 +156,9 @@ class Expression:
             j += 1
 
         return True
+
+    def get_string_rep(self):
+        return " ".join(self.tokens)
 
     def __str__(self):
         return str(self.tokens)
@@ -285,28 +295,58 @@ class AppliedRule:
 
 #%%
 
-
 import pydot
 
 
 class TreeGenerator:
 
     def __init__(self, premise):
-        self.graph = pydot.Dot('applied_rules', graph_type = 'graph', bgcolor = 'yellow')
-        self.root_node = pydot.Node('root', label = f'{str(premise)}')
-        self.node_id = 0
+        self.graph = pydot.Dot('applied_rules', graph_type = 'graph')
+        self.root_node = pydot.Node(0, label = self.get_rule_string(premise, "Initial root", None), shape = 'none')
+        self.graph.add_node(self.root_node)
+        self.node_id = 1
 
     def add_node(self, parent_node, applied_rule):
         new_nodes = []
-        for new_exp in applied_rule.created_expressions:
-            new_node = pydot.Node(self.node_id, label = f'{str(new_exp)}')
-            self.graph.add_node(new_node)
 
-            my_edge = pydot.Edge(parent_node.get_name(), str(self.node_id), color = 'blue')
+        if applied_rule.created_expressions is None:
+            new_node = pydot.Node(self.node_id, label = f'{self.get_rule_string([applied_rule.c_expression, applied_rule.matched_expression], applied_rule.rule_name, applied_rule.referenced_line)}', shape = 'none')
+            self.graph.add_node(new_node)
+            my_edge = pydot.Edge(parent_node.get_name(), str(self.node_id))
             self.graph.add_edge(my_edge)
             self.node_id += 1
             new_nodes.append(new_node)
+        else:
+            for new_exp in applied_rule.created_expressions.values():
+                new_node = pydot.Node(self.node_id, label = f'{self.get_rule_string(new_exp, applied_rule.rule_name, applied_rule.referenced_line)}', shape = 'none')
+                self.graph.add_node(new_node)
+
+                my_edge = pydot.Edge(parent_node.get_name(), str(self.node_id))
+                self.graph.add_edge(my_edge)
+                self.node_id += 1
+                new_nodes.append(new_node)
         return new_nodes
+
+    def get_rule_string(self, expression, rule_name, reference_line):
+
+        sorted_exp = sorted(expression, key = lambda expr: expr.id)
+
+        reference_line_str = f'<td ROWSPAN="{len(expression)}" SIDES="L">{reference_line}</td>' if reference_line is not None or rule_name == 'tautologie' else ""
+
+        tautologie_line = ""
+        table_head = f'<tr><td COLSPAN="3" ALIGN="CENTER" SIDES="B">{rule_name}</td></tr>'
+        if rule_name == 'tautologie':
+            tautologie_line = f'<tr><td COLSPAN="3" ALIGN="CENTER" SIDES="T">X</td></tr>'
+            table_head = ''
+
+        return f'''<
+        <table border="0" CELLBORDER="1">
+        {table_head}
+        {''.join([f'<tr><td BORDER="0" CELLSPACING="10">{orig.id}:</td><td BORDER="0" ALIGN="LEFT">{orig.get_string_rep()}</td>{reference_line_str if i == 0 else ""}</tr>' for i, orig in enumerate(sorted_exp)])}
+        {tautologie_line}
+        </table>
+        >'''
+        # return '\n'.join([' '.join(item.tokens) for item in expression])
 
     def create_file(self):
         return self.graph.to_string()
@@ -354,11 +394,12 @@ class TableauxSolver:
                 # Found Tautology with the matched clause
                 applied_rule = AppliedRule(
                     rule_name = "tautologie",
-                    referenced_line = i,
+                    referenced_line = curr_clause.id,
                     c_expression = curr_clause,
                     matched_expression = matched_clause,
                 )
                 self.applied_rules.append(applied_rule)
+                self.solve_tree.add_node(parent, applied_rule)
                 return True
 
         # Go over each clause and check if we can apply a rule
@@ -369,7 +410,7 @@ class TableauxSolver:
                 # Dont apply rule twice
                 applied_rule = AppliedRule(
                     rule_name = rule_name,
-                    referenced_line = i,
+                    referenced_line = curr_clause.id,
                     c_expression = curr_clause
                 )
                 if applied_rule in applied_rules:
@@ -411,6 +452,8 @@ class TableauxSolver:
 
 #%%
 
+Expression.id_counter = 1
+
 test_exp_1 = Expression(hypo_1)
 test_exp_4 = Expression("Peter plays tennis and badminton")
 test_exp_2 = Expression(hypo_2)
@@ -439,4 +482,4 @@ for rule in solver.applied_rules:
 from graphviz import Source
 
 src = Source(solver.solve_tree.create_file())
-src.render('test-output/holy-grenade.gv', view=True)
+src.render('solve-trees/first_example.gv', view=True)
