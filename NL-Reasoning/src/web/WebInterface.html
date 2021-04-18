@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Natural Language Prover</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+            integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"
+            integrity="sha512-XHDcSyqhOoO2ocB7sKOCJEkUjw/pQCJViP1ynpy+EGh/LggzrP6U/V3a++LQTnZT7sCQKeHRyWHfhN2afjXjCg=="
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.2"></script>
+    <script src="//d3js.org/d3.v5.min.js"></script>
+    <script src="https://unpkg.com/@hpcc-js/wasm@0.3.11/dist/index.min.js"></script>
+    <script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+    <style>
+        .expression_input > span {
+            display: inline-block;
+            width: 100px
+        }
+
+        .expression_input > input {
+            display: inline-block;
+            width: 500px
+        }
+    </style>
+</head>
+<body>
+<div>
+    <div id="app">
+        <fieldset name="form" class="list-group">
+            <label v-for="(item, index) in expressions" class="expression_input" class="list-group-item">
+                <span>{{index + 1}}. input:</span>
+                <input type="text" v-bind:value="item.value" placeholder="Next Expression"/>
+                <button v-on:click="remove_field(index)">-</button>
+                <button v-if="index == expressions.length-1" v-on:click="add_field">+</button>
+                <br>
+            </label>
+            <label class="expression_input" class="list-group-item">
+                <span>To be shown:</span>
+                <input type="text" v-bind:value="to_be_shown"/>
+                <br>
+            </label>
+            <button v-on:click="send_request">Solve</button>
+        </fieldset>
+
+        <div id="accordion">
+            <div class="card" v-for="(rule, index) in applied_rules">
+                <div class="card-header" id="headingOne">
+                    <h5 class="mb-0">
+                        <button class="btn btn-link" data-toggle="collapse" v-bind:data-target="'#collapse-' + index" aria-expanded="true" v-bind:aria-controls="'collapse-'+ index">
+                            Applied rule {{rule.rule_name}}
+                        </button>
+                    </h5>
+                </div>
+
+                <div v-bind:id="'collapse-' + index" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                    <div class="card-body">
+                        {{rule.c_expression}}
+                        {{rule.created_expressions}}
+                        {{rule.matched_expression}}
+                        {{rule.referenced_line}}
+                        {{rule.rule_name}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="color: red">{{error}}</div>
+        <div id="graph" style="text-align: center;"></div>
+    </div>
+</div>
+
+</body>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            expressions: [
+                {value: 'John plays football or chess'},
+                {value: 'When it is raining, John plays not football'},
+                {value: 'It is raining'}
+            ],
+            to_be_shown: 'John plays not football',
+            response: '',
+            error: '',
+            applied_rules: [],
+        },
+        methods: {
+            remove_field(index) {
+                this.expressions.splice(index, 1);
+            },
+            add_field() {
+                this.expressions.push(
+                    {value: ''}
+                )
+            },
+            send_request() {
+                // GET /someUrl
+                let data = {expressions: this.expressions, to_be_shown: this.to_be_shown};
+                this.$http.post('/solve-request', data).then(response => {
+
+                    // get body data
+                    this.response = response.body;
+                    this.applied_rules = response.body['applied_rules']
+                    this.display_tree(response.body['dot_graph'])
+                }, response => {
+                    // error callback
+                    this.error = response
+                });
+            },
+            display_tree(dot_graph) {
+                d3.select("#graph").graphviz()
+                    .renderDot(dot_graph);
+            }
+        },
+    })
+</script>
+</html>
