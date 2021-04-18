@@ -5,6 +5,7 @@ from src.logics.TableauxSolver import TableauxSolver
 class NaturalTableauxSolver:
 
     def __init__(self, clauses, to_be_shown):
+        Expression.id_counter = 0
         self.expressions = [
             Expression(clause) for clause in clauses
         ]
