@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Natural Language Prover</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
             integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
-            crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"
-            integrity="sha512-XHDcSyqhOoO2ocB7sKOCJEkUjw/pQCJViP1ynpy+EGh/LggzrP6U/V3a++LQTnZT7sCQKeHRyWHfhN2afjXjCg=="
             crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.2"></script>
@@ -25,8 +25,9 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
-    <style>
 
+    <style>
+        @import url("//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css");
         html {
             position: absolute;
             padding: 50px;
@@ -38,64 +39,111 @@
 
         .expression_input > span {
             display: inline-block;
-            width: 100px
+            width: 100px;
         }
 
         .expression_input > input {
             display: inline-block;
-            width: 500px
+            width: 500px;
+            transform: translateY(2px);
         }
 
         #graph > svg {
             width: 100%;
         }
 
+        .heading {
+            font-family: 'Dancing Script', cursive;
+            font-size: 6.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .applied_rules {
+            margin-top: 3rem;
+        }
+
     </style>
 </head>
 <body>
 <div>
+    <header>
+        <h1 class="heading">Natural Language Reasoner</h1>
+    </header>
     <div id="app">
         <fieldset name="form" class="list-group">
-            <label v-for="(item, index) in expressions" class="expression_input" class="list-group-item">
+            <label v-for="(item, index) in expressions" class="expression_input">
                 <span>{{index + 1}}. input:</span>
-                <input type="text" v-model:value="item.value" placeholder="Next Expression"/>
-                <button v-on:click="remove_field(index)">-</button>
-                <button v-if="index == expressions.length-1" v-on:click="add_field">+</button>
+                <input type="text" v-model:value="item.value" placeholder="Next Expression" class="form-control"/>
+                <button v-on:click="remove_field(index)" type="button" class="btn btn-danger">-</button>
+                <button v-if="index == expressions.length-1" v-on:click="add_field" type="button"
+                        class="btn btn-success">+
+                </button>
                 <br>
             </label>
             <label class="expression_input" class="list-group-item">
                 <span>To be shown:</span>
-                <input type="text" v-bind:value="to_be_shown"/>
+                <input type="text" v-bind:value="to_be_shown" class="form-control"/>
                 <br>
             </label>
-            <button v-on:click="send_request">Solve</button>
+            <button v-on:click="send_request" type="button" class="btn btn-primary">Solve</button>
         </fieldset>
+        <div class="card applied_rules" v-if="applied_rules.length != 0">
+            <div class="card-header" >
+                <h3 class="mb-0 d-inline align-middle" >Applied Rules</h3>
+              <button class="btn btn-default float-right align-middle" type="button" data-toggle="collapse" data-target="#accordion" aria-expanded="false" aria-controls="collapseExample" v-on:click="up = !up">
+                <span class="glyphicon glyphicon-chevron-up" aria-hidden="true" v-if="up == false" ></span>
+                <span class="glyphicon glyphicon-chevron-down" aria-hidden="true" v-if="up == true" ></span>
+              </button>
+            </div>
+            <div id="accordion" class="collapse">
+                <div class="card" v-for="(rule, index) in applied_rules">
+                    <div class="card-header" id="headingOne">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link align-middle" data-toggle="collapse"
+                                    v-bind:data-target="'#collapse-' + index"
+                                    aria-expanded="true" v-bind:aria-controls="'collapse-'+ index">
+                                {{index}}. applied rule {{rule.rule_name}}
+                            </button>
+                        </h5>
+                    </div>
 
-        <div id="graph" style="text-align: center; width: 100%;"></div>
+                    <div v-bind:id="'collapse-' + index" class="collapse" aria-labelledby="headingOne"
+                         data-parent="#accordion">
+                        <div class="card-body">
 
-        <div id="accordion">
-            <div class="card" v-for="(rule, index) in applied_rules">
-                <div class="card-header" id="headingOne">
-                    <h5 class="mb-0">
-                        <button class="btn btn-link" data-toggle="collapse" v-bind:data-target="'#collapse-' + index"
-                                aria-expanded="true" v-bind:aria-controls="'collapse-'+ index">
-                            {{index}}. applied rule {{rule.rule_name}}
-                        </button>
-                    </h5>
-                </div>
-
-                <div v-bind:id="'collapse-' + index" class="collapse" aria-labelledby="headingOne"
-                     data-parent="#accordion">
-                    <div class="card-body">
-                        {{rule.referenced_line}}
-                        {{rule.created_expressions}}
-                        {{rule.c_expression}}
-                        {{rule.matched_expression}}
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Referenced Line</th>
+                                    <th scope="col" v-if="rule.created_expressions">Created Expressions</th>
+                                    <th scope="col">Used Expression</th>
+                                    <th scope="col" v-if="rule.matched_expression != 'None'">Matched Expression</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>{{rule.referenced_line}}</td>
+                                    <td v-if="rule.created_expressions">
+                                        <ul>
+                                            <li v-for="expression_list in rule.created_expressions">
+                                                {{expression_list}}
+                                            </li>
+                                        </ul>
+                                    </td>
+                                    <td>{{rule.c_expression}}</td>
+                                    <td v-if="rule.matched_expression != 'None'">{{rule.matched_expression}}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         <div style="color: red">{{error}}</div>
+
+        <div id="graph" style="text-align: center; width: 100%;"></div>
 
     </div>
 </div>
@@ -114,6 +162,7 @@
             response: '',
             error: '',
             applied_rules: [],
+            up: true
         },
         methods: {
             remove_field(index) {
@@ -133,6 +182,15 @@
                     // get body data
                     this.response = response.body;
                     this.applied_rules = response.body['applied_rules']
+
+                    for (let applied_rule_idx in this.applied_rules) {
+                        applied_rule = this.applied_rules[applied_rule_idx]
+                        if (applied_rule.created_expressions) {
+                            console.log(applied_rule.created_expressions.replaceAll("'", '"'))
+                            applied_rule.created_expressions = JSON.parse(applied_rule.created_expressions.replaceAll("'", '"'))
+                        }
+                    }
+
                     this.display_tree(response.body['dot_graph'])
                 }, response => {
                     // error callback

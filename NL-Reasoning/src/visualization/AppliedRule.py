@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Dict
 
 from src.logics.Expression import Expression
 
@@ -10,13 +10,13 @@ class AppliedRule:
     referenced_line: int = field()
     c_expression: Expression = field(default = None, compare = False, hash = False)
     matched_expression: Expression = field(default = None, compare = False, hash = False)
-    created_expressions: List[Expression] = field(default = None, compare = False, hash = False)
+    created_expressions: Dict[int, Expression] = field(default = None, compare = False, hash = False)
 
     def get_dict(self):
         return dict(
             rule_name = self.rule_name,
             referenced_line = self.referenced_line,
-            created_expressions = str(self.c_expression),
-            c_expression = str(self.matched_expression),
-            matched_expression = str(self.created_expressions),
+            created_expressions = None if self.created_expressions is None else str([expression for expression in self.created_expressions.values()]),
+            c_expression =str(self.c_expression),
+            matched_expression = str(self.matched_expression),
         )
