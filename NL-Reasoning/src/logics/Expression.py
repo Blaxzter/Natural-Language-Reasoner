@@ -1,6 +1,6 @@
 from typing import List
 
-from src.utils.utils import tokenize, detect_sentence_structure
+from utils.utils import tokenize, detect_sentence_structure
 
 
 class Expression:

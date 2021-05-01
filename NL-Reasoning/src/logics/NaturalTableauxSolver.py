@@ -1,5 +1,5 @@
-from src.logics.Expression import Expression
-from src.logics.TableauxSolver import TableauxSolver
+from logics.Expression import Expression
+from logics.TableauxSolver import TableauxSolver
 
 
 class NaturalTableauxSolver:

@@ -1,6 +1,6 @@
 import pydot
 
-from src.logics.Expression import Expression
+from logics.Expression import Expression
 
 
 class TreeGenerator:

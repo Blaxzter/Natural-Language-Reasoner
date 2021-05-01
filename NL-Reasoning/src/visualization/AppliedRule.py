@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import List, Dict
 
-from src.logics.Expression import Expression
+from logics.Expression import Expression
 
 
 @dataclass()

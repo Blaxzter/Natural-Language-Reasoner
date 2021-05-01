@@ -1,5 +1,4 @@
-from src.logics.Expression import Expression
-from src.logics.TableauxSolver import TableauxSolver
+from logics.Expression import Expression
 
 if __name__ == '__main__':
 

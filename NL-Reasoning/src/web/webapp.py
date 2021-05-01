@@ -6,7 +6,7 @@ from pyramid.config import Configurator
 from pyramid.request import Request
 from pyramid.response import Response, FileResponse
 
-from src.logics.NaturalTableauxSolver import NaturalTableauxSolver
+from logics.NaturalTableauxSolver import NaturalTableauxSolver
 
 
 def get_main_page(request):
@@ -42,7 +42,7 @@ def get_solve_request(request: Request):
         return response
 
 
-if __name__ == '__main__':
+def start_web_server():
     with Configurator() as config:
         config.add_route('main', '/')
         config.add_route('solve-request', '/solve-request')

@@ -2,7 +2,7 @@
 from collections import defaultdict
 from typing import Any, Dict, Callable
 
-from src.logics.Expression import Expression
+from logics.Expression import Expression
 
 
 # Assume simple structure for now with a and b ... no a and b or c and d

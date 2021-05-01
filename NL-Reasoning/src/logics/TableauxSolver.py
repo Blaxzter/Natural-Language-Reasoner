@@ -1,9 +1,9 @@
 from typing import List
 
-from src.logics.Expression import Expression
-from src.logics.LogicFunctions import rule_set
-from src.visualization.AppliedRule import AppliedRule
-from src.visualization.TreeGenerator import TreeGenerator
+from logics.Expression import Expression
+from logics.LogicFunctions import rule_set
+from visualization.AppliedRule import AppliedRule
+from visualization.TreeGenerator import TreeGenerator
 
 
 class TableauxSolver:
