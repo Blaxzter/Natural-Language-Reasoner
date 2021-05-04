@@ -71,6 +71,28 @@ class Expression:
 
         raise ValueError(f'Hypothesis cant be reversed: {str(self)}')
 
+
+    # the same method, but it uses exclamation mark instead
+    def reverse_expression_mark(self):
+        """
+        Function that inserts a not or removes it
+        :return: The hypothesis reversed
+        """
+        # Cant reverse expression if not base expression
+        if not self.is_base_expression:
+            return
+
+        sentence_structure = detect_sentence_structure(self.tokens)
+
+        if sentence_structure == 1 or sentence_structure == 2:
+            self.tokens.insert(0, "!")
+            return
+        elif sentence_structure == 3 or sentence_structure == 4:
+            self.tokens.remove("!")
+            return
+
+        raise ValueError(f'Hypothesis cant be reversed: {str(self)}')
+
     def is_tautologie_of(self, clause):
 
         if not self.is_base_expression or not clause.is_base_expression:
@@ -115,8 +137,12 @@ class Expression:
     def is_applicable(self, param):
         # Simple structure expected for now explanation further down for now just a in check
         # TODO more elaborate // Add hierarchical structure
+
         if self.is_base_expression:
             return False
+        if param == 'deMorgan':
+            if self.contains('!('):
+                return True
 
         return param in self.tokens
 
@@ -128,5 +154,13 @@ class Expression:
         elif split_token == 'when':
             # Probably dont want to support hierarchical structures with when expression
             return self.tokens.index(',')
+        elif split_token == 'DeMorgan':
+            return self.tokens.index('!(')
 
         raise NotImplementedError("The rule has not been implemented yet.")
+
+    def contains(self, word):
+        if word in self.tokens:
+            return True
+        else:
+            return False

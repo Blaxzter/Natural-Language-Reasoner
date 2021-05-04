@@ -6,9 +6,17 @@ def tokenize(sentence: str):
             c_token = token.split(',')
             ret_tokens.append(c_token[0])
             ret_tokens.append(',')
+        elif '!(' in token:
+            c_token = token.split('!(')
+            ret_tokens.append('!(')
+            ret_tokens.append(c_token[1])
+        elif ')' in token:
+            c_token = token.split(')')
+            ret_tokens.append(c_token[0])
+            ret_tokens.append(')')
         else:
             ret_tokens.append(token)
-
+    print(ret_tokens)
     return ret_tokens
 
 

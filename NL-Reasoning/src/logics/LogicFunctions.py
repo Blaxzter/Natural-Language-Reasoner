@@ -66,9 +66,49 @@ def when_rule(clause: Expression):
     return new_clauses
 
 
+def de_Morgan_Law(clause: Expression) -> defaultdict:
+    new_clauses = defaultdict(list)
+
+    if not clause.is_applicable('deMorgan'):
+        return new_clauses
+
+    if clause.contains('and'):
+        split_index = clause.get_applicable_token('and')
+        left_tokens = list(clause.tokens[:split_index])
+        right_tokens = list(clause.tokens[split_index+1:])
+
+        new_right_tokens = list(left_tokens[:-1])
+        new_right_tokens.extend(right_tokens)
+        left_tokens.extend([')', 'or'])
+        complete_sentence = list(left_tokens)
+        complete_sentence.extend(new_right_tokens)
+
+        new_clauses[0].append(left_tokens)
+        new_clauses[1].append(new_right_tokens)
+        return new_clauses
+
+    if clause.contains('or'):
+        split_index = clause.get_applicable_token('or')
+        left_tokens = list(clause.tokens[:split_index])
+        right_tokens = list(clause.tokens[split_index + 1:])
+
+        new_right_tokens = list(left_tokens[:-1])
+        new_right_tokens.extend(right_tokens)
+        left_tokens.extend([')', 'and'])
+        complete_sentence = list(left_tokens)
+        complete_sentence.extend(new_right_tokens)
+        new_clauses[0].append(left_tokens)
+        new_clauses[1].append(new_right_tokens)
+        return new_clauses
+
+
+
 # Order is important, try to not branch to early
 rule_set: Dict[Any, Callable[[Expression], Dict[Any, Expression]]] = dict(
+    de_Morgan_Law = de_Morgan_Law,
     and_rule = and_rule,
     or_rule = or_rule,
     when_rule = when_rule,
 )
+
+
