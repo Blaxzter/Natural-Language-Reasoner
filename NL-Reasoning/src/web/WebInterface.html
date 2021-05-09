@@ -29,12 +29,14 @@
     <style>
         @import url("//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css");
         html {
-            position: absolute;
-            padding: 50px;
-            left: 50%;
-            transform: translateX(-50%);
+            height: 100%
+        }
+
+        main {
             max-width: 800px;
             min-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .expression_input > span {
@@ -63,88 +65,95 @@
             margin-top: 3rem;
         }
 
+        .graph {
+            text-align: center;
+            width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
     </style>
 </head>
 <body>
 <div>
-    <header>
-        <h1 class="heading">Natural Language Reasoner</h1>
-    </header>
     <div id="app">
-        <fieldset name="form" class="list-group">
-            <label v-for="(item, index) in expressions" class="expression_input">
-                <span>{{index + 1}}. input:</span>
-                <input type="text" v-model:value="item.value" placeholder="Next Expression" class="form-control"/>
-                <button v-on:click="remove_field(index)" type="button" class="btn btn-danger">-</button>
-                <button v-if="index == expressions.length-1" v-on:click="add_field" type="button"
-                        class="btn btn-success">+
-                </button>
-                <br>
-            </label>
-            <label class="expression_input" class="list-group-item">
-                <span>To be shown:</span>
-                <input type="text" v-bind:value="to_be_shown" class="form-control"/>
-                <br>
-            </label>
-            <button v-on:click="send_request" type="button" class="btn btn-primary" style="margin-top: 8px;">Solve</button>
-        </fieldset>
-        <div class="card applied_rules" v-if="applied_rules.length != 0">
-            <div class="card-header" >
-                <h3 class="mb-0 d-inline align-middle" >Applied Rules</h3>
-              <button class="btn btn-default float-right align-middle" type="button" data-toggle="collapse" data-target="#accordion" aria-expanded="false" aria-controls="collapseExample" v-on:click="up = !up">
-                <span class="glyphicon glyphicon-chevron-up" aria-hidden="true" v-if="up == false" ></span>
-                <span class="glyphicon glyphicon-chevron-down" aria-hidden="true" v-if="up == true" ></span>
-              </button>
-            </div>
-            <div id="accordion" class="collapse">
-                <div class="card" v-for="(rule, index) in applied_rules">
-                    <div class="card-header" id="headingOne">
-                        <h5 class="mb-0">
-                            <button class="btn btn-link align-middle" data-toggle="collapse"
-                                    v-bind:data-target="'#collapse-' + index"
-                                    aria-expanded="true" v-bind:aria-controls="'collapse-'+ index">
-                                {{index}}. applied rule {{rule.rule_name}}
-                            </button>
-                        </h5>
-                    </div>
+        <main>
+            <header>
+                <h1 class="heading">Natural Language Reasoner</h1>
+            </header>
+            <fieldset name="form" class="list-group">
+                <label v-for="(item, index) in expressions" class="expression_input">
+                    <span>{{index + 1}}. input:</span>
+                    <input type="text" v-model:value="item.value" placeholder="Next Expression" class="form-control"/>
+                    <button v-on:click="remove_field(index)" type="button" class="btn btn-danger">-</button>
+                    <button v-if="index == expressions.length-1" v-on:click="add_field" type="button"
+                            class="btn btn-success">+
+                    </button>
+                    <br>
+                </label>
+                <label class="expression_input" class="list-group-item">
+                    <span>To be shown:</span>
+                    <input type="text" v-bind:value="to_be_shown" class="form-control"/>
+                    <br>
+                </label>
+                <button v-on:click="send_request" type="button" class="btn btn-primary" style="margin-top: 8px;">Solve</button>
+            </fieldset>
+            <div class="card applied_rules" v-if="applied_rules.length != 0">
+                <div class="card-header" >
+                    <h3 class="mb-0 d-inline align-middle" >Applied Rules</h3>
+                  <button class="btn btn-default float-right align-middle" type="button" data-toggle="collapse" data-target="#accordion" aria-expanded="false" aria-controls="collapseExample" v-on:click="up = !up">
+                    <span class="glyphicon glyphicon-chevron-up" aria-hidden="true" v-if="up == false" ></span>
+                    <span class="glyphicon glyphicon-chevron-down" aria-hidden="true" v-if="up == true" ></span>
+                  </button>
+                </div>
+                <div id="accordion" class="collapse">
+                    <div class="card" v-for="(rule, index) in applied_rules">
+                        <div class="card-header" id="headingOne">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link align-middle" data-toggle="collapse"
+                                        v-bind:data-target="'#collapse-' + index"
+                                        aria-expanded="true" v-bind:aria-controls="'collapse-'+ index">
+                                    {{index}}. applied rule {{rule.rule_name}}
+                                </button>
+                            </h5>
+                        </div>
 
-                    <div v-bind:id="'collapse-' + index" class="collapse" aria-labelledby="headingOne"
-                         data-parent="#accordion">
-                        <div class="card-body">
+                        <div v-bind:id="'collapse-' + index" class="collapse" aria-labelledby="headingOne"
+                             data-parent="#accordion">
+                            <div class="card-body">
 
-                            <table class="table">
-                                <thead>
-                                <tr>
-                                    <th scope="col">Referenced Line</th>
-                                    <th scope="col" v-if="rule.created_expressions">Created Expressions</th>
-                                    <th scope="col">Used Expression</th>
-                                    <th scope="col" v-if="rule.matched_expression != 'None'">Matched Expression</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>{{rule.referenced_line}}</td>
-                                    <td v-if="rule.created_expressions">
-                                        <ul>
-                                            <li v-for="expression_list in rule.created_expressions">
-                                                {{expression_list}}
-                                            </li>
-                                        </ul>
-                                    </td>
-                                    <td>{{rule.c_expression}}</td>
-                                    <td v-if="rule.matched_expression != 'None'">{{rule.matched_expression}}</td>
-                                </tr>
-                                </tbody>
-                            </table>
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">Referenced Line</th>
+                                        <th scope="col" v-if="rule.created_expressions">Created Expressions</th>
+                                        <th scope="col">Used Expression</th>
+                                        <th scope="col" v-if="rule.matched_expression != 'None'">Matched Expression</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>{{rule.referenced_line}}</td>
+                                        <td v-if="rule.created_expressions">
+                                            <ul>
+                                                <li v-for="expression_list in rule.created_expressions">
+                                                    {{expression_list}}
+                                                </li>
+                                            </ul>
+                                        </td>
+                                        <td>{{rule.c_expression}}</td>
+                                        <td v-if="rule.matched_expression != 'None'">{{rule.matched_expression}}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div style="color: red">{{error}}</div>
-
-        <div id="graph" style="text-align: center; width: 100%;"></div>
-
+            <div style="color: red">{{error}}</div>
+        </main>
+        <div id="graph" class="graph"></div>
     </div>
 </div>
 

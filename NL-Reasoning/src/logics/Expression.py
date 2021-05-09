@@ -24,8 +24,17 @@ class Expression:
 
         self.split_references()
 
+        self.is_syllogism = False
+
         # A base expression has a few cases
         self.is_base_expression = False
+
+        # Check for syllogisms
+        if self.tokens[0] == 'therefore':
+            self.tokens = self.tokens[2:]
+            self.is_syllogism = True
+
+
         # Simple test if we have 3 or 4 (in not case) tokens then it is a base expression
         if len(self) == 3 or len(self) == 4:
             self.is_base_expression = True

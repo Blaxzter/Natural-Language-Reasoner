@@ -20,7 +20,7 @@ class TableauxSolver:
             clauses = []
             for claus in self.hypothesis:
                 clauses.append(claus)
-            self.thesis.reverse_expression()
+            self.thesis.reverse_expression_mark()
             clauses.append(self.thesis)
             self.solve_tree = TreeGenerator(clauses)
             result = self.recursive_proof(clauses, [], parent = self.solve_tree.root_node)
