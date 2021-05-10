@@ -65,7 +65,7 @@ class Expression:
         :return: The hypothesis reversed
         """
         # Cant reverse expression if not base expression
-        if not self.is_base_expression:
+                if not self.is_base_expression:
             return
 
         # TODO decide if we want to use a flag for a expression or use not (currently)
@@ -75,7 +75,11 @@ class Expression:
             self.tokens.insert(2, "not")
             return
         elif sentence_structure == 3 or sentence_structure == 4:
-            self.tokens.remove("not")
+            if "not" in self.tokens:
+                self.tokens.remove("not")
+            elif "never" in self.tokens:
+                self.tokens.remove("never")
+
             return
 
         raise ValueError(f'Hypothesis cant be reversed: {str(self)}')
@@ -126,7 +130,7 @@ class Expression:
         # Probably not to smart :sweat_smile:
         j = 0
         for token in longer_clause.tokens:
-            if token == "not" or token == "!" or token == "(" or token == ")":
+            if token == "not" or token == "never" or token == "!" or token == "(" or token == ")":
                 continue
             if token != shorter_clause.tokens[j]:
                 return False
@@ -163,7 +167,7 @@ class Expression:
         # TODO more elaborate // Add hierarchical structure
         if split_token == 'and' or split_token == 'or':
             return self.tokens.index(split_token)
-        elif split_token == 'when':
+        elif split_token == 'when' or split_token == 'if':
             # Probably dont want to support hierarchical structures with when expression
             return self.tokens.index(',')
         elif split_token == 'DeMorgan':
