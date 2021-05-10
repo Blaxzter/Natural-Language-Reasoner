@@ -9,7 +9,7 @@ from logics.Expression import Expression
 # For that we would need to do a binding check or something and convert
 # the Expression into a hierarchical structure and call something like is applicable
 # In the case of a and b or c and d it would be like this (a and b) or (c and d) and i
-# dont think you can apply the and rule here
+# dont think you can apply the and rule here 
 
 
 def simple_split_rule(clause: Expression, split_token: str):
