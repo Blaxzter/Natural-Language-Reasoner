@@ -44,21 +44,31 @@ def or_rule(clause: Expression) -> defaultdict:
 def when_rule(clause: Expression):
     new_clauses = defaultdict(list)
 
-    if not clause.is_applicable('when'):
+    if not (clause.is_applicable('when') or clause.is_applicable('if')):
         return new_clauses
+    elif clause.is_applicable('when'):
+        split_index = clause.get_applicable_token('when')
+    elif clause.is_applicable('if'):
+        split_index = clause.get_applicable_token('if')
 
-    split_index = clause.get_applicable_token('when')
     left_tokens = list(clause.tokens[:split_index])
     right_tokens = list(clause.tokens[split_index + 1:])
 
     if 'when' in left_tokens:
         when_token = left_tokens
         not_when_token = right_tokens
+    elif 'if' in left_tokens:
+        when_token = left_tokens
+        not_when_token = right_tokens
     else:
         not_when_token = left_tokens
         when_token = right_tokens
 
-    when_token.remove('when')
+    if 'when' in when_token:
+        when_token.remove('when')
+    else:
+        when_token.remove('if')
+
     when_expression = Expression(when_token)
     when_expression.reverse_expression()
     new_clauses[0].append(when_expression)
