@@ -2,21 +2,26 @@ def tokenize(sentence: str):
     tokens = sentence.split(" ")
     ret_tokens = []
     for i, token in enumerate(tokens):
-        if ',' in token:
-            c_token = token.split(',')
-            ret_tokens.append(c_token[0])
-            ret_tokens.append(',')
-        elif '!(' in token:
-            c_token = token.split('!(')
-            ret_tokens.append('!(')
-            ret_tokens.append(c_token[1])
-        elif ')' in token:
-            c_token = token.split(')')
-            ret_tokens.append(c_token[0])
-            ret_tokens.append(')')
+        if ',' in token or '!' in token or ')' in token or '(' in token:
+            if ',' in token:
+                c_token = token.split(',')
+                ret_tokens.append(c_token[0])
+                ret_tokens.append(',')
+            if '!(' in token:
+                c_token = token.split('!(')
+                ret_tokens.append('!')
+                ret_tokens.append('(')
+                ret_tokens.append(c_token[1])
+            elif '!' in token:
+                c_token = token.split('!')
+                ret_tokens.append('!')
+                ret_tokens.append(c_token[1])
+            if ')' in token:
+                c_token = token.split(')')
+                ret_tokens.append(c_token[0])
+                ret_tokens.append(')')
         else:
             ret_tokens.append(token)
-    print(ret_tokens)
     return ret_tokens
 
 

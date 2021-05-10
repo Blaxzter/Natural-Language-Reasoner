@@ -99,6 +99,9 @@ def de_Morgan_Law(clause: Expression) -> defaultdict:
         complete_sentence.extend(new_right_tokens)
         new_clauses[0].append(left_tokens)
         new_clauses[1].append(new_right_tokens)
+        for tokens in [left_tokens, new_right_tokens]:
+            if len(left_tokens) != 0 and len(new_right_tokens) != 0:
+                new_clauses[0] += tokens
         return new_clauses
 
 

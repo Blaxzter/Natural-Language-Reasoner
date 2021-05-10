@@ -97,7 +97,10 @@ class Expression:
             self.tokens.insert(0, "!")
             return
         elif sentence_structure == 3 or sentence_structure == 4:
-            self.tokens.remove("!")
+            if '!' in self.tokens:
+                self.tokens.remove("!")
+            else:
+                self.tokens.remove("not")
             return
 
         raise ValueError(f'Hypothesis cant be reversed: {str(self)}')
@@ -123,7 +126,7 @@ class Expression:
         # Probably not to smart :sweat_smile:
         j = 0
         for token in longer_clause.tokens:
-            if token == "not":
+            if token == "not" or token == "!" or token == "(" or token == ")":
                 continue
             if token != shorter_clause.tokens[j]:
                 return False
@@ -150,7 +153,7 @@ class Expression:
         if self.is_base_expression:
             return False
         if param == 'deMorgan':
-            if self.contains('!('):
+            if self.contains('!') and self.contains('('):
                 return True
 
         return param in self.tokens
