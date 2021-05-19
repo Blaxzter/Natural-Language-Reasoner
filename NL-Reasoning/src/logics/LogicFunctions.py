@@ -3,6 +3,7 @@ from collections import defaultdict
 from typing import Any, Dict, Callable
 
 from logics.Expression import Expression
+from utils.utils import swap_exclamation_marks
 
 
 # Assume simple structure for now with a and b ... no a and b or c and d
@@ -89,13 +90,14 @@ def de_Morgan_Law(clause: Expression) -> defaultdict:
 
         new_right_tokens = list(left_tokens[:-1])
         new_right_tokens.extend(right_tokens)
-        left_tokens.extend([')', 'or'])
-        complete_sentence = list(left_tokens)
-        complete_sentence.extend(new_right_tokens)
+        left_tokens.extend([')'])
+        # complete_sentence = list(left_tokens)
+        # complete_sentence.extend(new_right_tokens)
+        left_tokens = swap_exclamation_marks(left_tokens)
+        new_right_tokens = swap_exclamation_marks(new_right_tokens)
+        new_clauses[0].append(Expression(left_tokens))
+        new_clauses[1].append(Expression(new_right_tokens))
 
-        new_clauses[0].append(left_tokens)
-        new_clauses[1].append(new_right_tokens)
-        return new_clauses
 
     if clause.contains('or'):
         split_index = clause.get_applicable_token('or')
@@ -104,15 +106,21 @@ def de_Morgan_Law(clause: Expression) -> defaultdict:
 
         new_right_tokens = list(left_tokens[:-1])
         new_right_tokens.extend(right_tokens)
-        left_tokens.extend([')', 'and'])
-        complete_sentence = list(left_tokens)
-        complete_sentence.extend(new_right_tokens)
-        new_clauses[0].append(left_tokens)
-        new_clauses[1].append(new_right_tokens)
-        for tokens in [left_tokens, new_right_tokens]:
-            if len(left_tokens) != 0 and len(new_right_tokens) != 0:
-                new_clauses[0] += tokens
-        return new_clauses
+        left_tokens.extend([')'])
+        # complete_sentence = list(left_tokens)
+        # complete_sentence.extend(new_right_tokens)
+
+        left_tokens = swap_exclamation_marks(left_tokens)
+        new_right_tokens = swap_exclamation_marks(new_right_tokens)
+        # left_tokens = Expression(left_tokens)
+        # new_right_tokens = Expression(new_right_tokens)
+        # new_clauses[0].append(Expression(left_tokens))
+        # new_clauses[1].append(Expression(new_right_tokens))
+        result = [Expression(left_tokens), Expression(new_right_tokens)]
+        if len(left_tokens) != 0 and len(new_right_tokens) != 0:
+            new_clauses[0] += result
+
+    return new_clauses
 
 
 

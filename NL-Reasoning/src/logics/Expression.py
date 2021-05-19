@@ -65,7 +65,7 @@ class Expression:
         :return: The hypothesis reversed
         """
         # Cant reverse expression if not base expression
-                if not self.is_base_expression:
+        if not self.is_base_expression:
             return
 
         # TODO decide if we want to use a flag for a expression or use not (currently)
@@ -103,7 +103,7 @@ class Expression:
         elif sentence_structure == 3 or sentence_structure == 4:
             if '!' in self.tokens:
                 self.tokens.remove("!")
-            else:
+            elif 'not' in self.tokens:
                 self.tokens.remove("not")
             return
 

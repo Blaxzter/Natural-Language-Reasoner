@@ -52,3 +52,22 @@ def detect_sentence_structure(sentence_tokens):
         return 4
 
     raise ValueError(f'Sentence structure is not detected: {str(sentence_tokens)}')
+
+def swap_exclamation_marks(sentence_tokens):
+    if '(' in sentence_tokens:
+        sentence_tokens.remove('(')
+    if ')' in sentence_tokens:
+        sentence_tokens.remove(')')
+    if '!' in sentence_tokens:
+        sentence_tokens.remove('!')
+
+    sentence_type = detect_sentence_structure(sentence_tokens)
+
+    if sentence_type == 1 or 2:
+        sentence_tokens.insert(2, "not")
+    elif sentence_type == 2 or 4:
+        sentence_tokens.remove("not")
+
+    return sentence_tokens
+
+
