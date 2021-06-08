@@ -1,10 +1,10 @@
 from typing import List
 
+from logics.Constants import connection_keywords
 from utils.utils import tokenize, detect_sentence_structure
 
 
 class Expression:
-
     id_counter = 0
 
     def __init__(self, hypothesis):
@@ -24,28 +24,13 @@ class Expression:
 
         self.split_references()
 
-        self.is_syllogism = False
-
-        # A base expression has a few cases
-        self.is_base_expression = False
-
-        # Check for syllogisms
-        if self.tokens[0] == 'therefore':
-            self.tokens = self.tokens[2:]
-            self.is_syllogism = True
-
-
-        # Simple test if we have 3 or 4 (in not case) tokens then it is a base expression
-        if len(self) == 3 or len(self) == 4:
-            self.is_base_expression = True
-
     def split_references(self):
         """
         Splits the sentence that references previous subjects into multiple base tokens
         TODO Should probably be rewritten to check if separated by semicolon
         :return:
         """
-        for reference in ['or', 'and']:
+        for reference in connection_keywords:
             if reference in self.tokens:
                 reference_idx = self.tokens.index(reference)
                 right_tokens = self.tokens[reference_idx + 1:]
@@ -59,87 +44,8 @@ class Expression:
 
                 self.tokens = left_tokens + [reference] + base_tokens + right_tokens
 
-    def reverse_expression(self):
-        """
-        Function that inserts a not or removes it
-        :return: The hypothesis reversed
-        """
-        # Cant reverse expression if not base expression
-        if not self.is_base_expression:
-            return
-
-        # TODO decide if we want to use a flag for a expression or use not (currently)
-        sentence_structure = detect_sentence_structure(self.tokens)
-
-        if sentence_structure == 1 or sentence_structure == 2:
-            self.tokens.insert(2, "not")
-            return
-        elif sentence_structure == 3 or sentence_structure == 4:
-            if "not" in self.tokens:
-                self.tokens.remove("not")
-            elif "never" in self.tokens:
-                self.tokens.remove("never")
-
-            return
-
-        raise ValueError(f'Hypothesis cant be reversed: {str(self)}')
-
-
-    # the same method, but it uses exclamation mark instead
-    def reverse_expression_mark(self):
-        """
-        Function that inserts a not or removes it
-        :return: The hypothesis reversed
-        """
-        # Cant reverse expression if not base expression
-        if not self.is_base_expression:
-            return
-
-        sentence_structure = detect_sentence_structure(self.tokens)
-
-        if sentence_structure == 1 or sentence_structure == 2:
-            self.tokens.insert(0, "!")
-            return
-        elif sentence_structure == 3 or sentence_structure == 4:
-            if '!' in self.tokens:
-                self.tokens.remove("!")
-            elif 'not' in self.tokens:
-                self.tokens.remove("not")
-            return
-
-        raise ValueError(f'Hypothesis cant be reversed: {str(self)}')
-
-    def is_tautologie_of(self, clause):
-
-        if not self.is_base_expression or not clause.is_base_expression:
-            return False
-
-        shorter_clause = None
-        longer_clause = None
-
-        if len(self) == len(clause) + 1:
-            shorter_clause = clause
-            longer_clause = self
-        elif len(self) == len(clause) - 1:
-            shorter_clause = self
-            longer_clause = clause
-        else:
-            return False
-
-        # Go over each token check for equals and also if not is on the correct location
-        # Probably not to smart :sweat_smile:
-        j = 0
-        for token in longer_clause.tokens:
-            if token == "not" or token == "never" or token == "!" or token == "(" or token == ")":
-                continue
-            if token != shorter_clause.tokens[j]:
-                return False
-            j += 1
-
-        return True
-
     def get_string_rep(self):
-        return " ".join(self.tokens) if self.is_base_expression else self.init_hypo
+        return self.init_hypo
 
     def __str__(self):
         return str(self.tokens)
