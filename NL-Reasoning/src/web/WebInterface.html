@@ -6,28 +6,22 @@
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
-            integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
-            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.2"></script>
     <script src="//d3js.org/d3.v5.min.js"></script>
     <script src="https://unpkg.com/@hpcc-js/wasm@0.3.11/dist/index.min.js"></script>
     <script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-            crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-            crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
             crossorigin="anonymous"></script>
     <link rel="icon" href="favicon.ico" type="image/x-icon"/>
     <style>
         @import url("//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css");
+
         html {
             height: 100%
         }
@@ -78,10 +72,28 @@
 <div>
     <div id="app">
         <main>
+
             <header>
                 <h1 class="heading">Natural Language Reasoner</h1>
             </header>
-            <fieldset name="form" class="list-group">
+
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item" v-for="tab in tabs" :class="{ dropdown: tab.examples.length >= 1}"
+                    role="presentation">
+                    <a v-if="tab.examples.length == 1" class="nav-link" :class="{ active: tab.tab_name == current_tab}"
+                       aria-current="page" v-on:click="change_tab(tab, -1)">{{tab.tab_name}}</a>
+
+                    <a v-if="tab.examples.length > 1" class="nav-link dropdown-toggle" data-toggle="dropdown"
+                       :class="{ active: tab.tab_name == current_tab}" data-bs-toggle="dropdown"  data-bs-auto-close="true" href="#" aria-expanded="false">{{tab.tab_name}}</a>
+                    <ul v-if="tab.examples.length > 1" class="dropdown dropdown-menu" role="menu" v-bind:id="tab.tab_name">
+                        <li v-for="(example, index) in tab.examples">
+                            <a class="dropdown-item" href="#" v-on:click="change_tab(tab, index)">{{example.name}}</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <fieldset name="form" class="list-group p-5 border-end border-bottom border-start tab-content">
                 <label v-for="(item, index) in expressions" class="expression_input">
                     <span>{{index + 1}}. input:</span>
                     <input type="text" v-model:value="item.value" placeholder="Next Expression" class="form-control"/>
@@ -96,32 +108,34 @@
                     <input type="text" v-bind:value="to_be_shown" class="form-control"/>
                     <br>
                 </label>
-                <button v-on:click="send_request" type="button" class="btn btn-primary" style="margin-top: 8px;">Solve</button>
+                <button v-on:click="send_request" type="button" class="btn btn-primary" style="margin-top: 8px;">Solve
+                </button>
             </fieldset>
             <div class="card applied_rules" v-if="applied_rules.length != 0">
-                <div class="card-header" >
-                    <h3 class="mb-0 d-inline align-middle" >Applied Rules</h3>
-                  <button class="btn btn-default float-right align-middle" type="button" data-toggle="collapse" data-target="#accordion" aria-expanded="false" aria-controls="collapseExample" v-on:click="up = !up">
-                    <span class="glyphicon glyphicon-chevron-up" aria-hidden="true" v-if="up == false" ></span>
-                    <span class="glyphicon glyphicon-chevron-down" aria-hidden="true" v-if="up == true" ></span>
-                  </button>
+                <div class="card-header">
+                    <h3 class="mb-0 d-inline align-middle">Applied Rules</h3>
+                    <button class="btn btn-default float-right align-middle"
+                            type="button" data-bs-toggle="collapse" data-bs-target="#accordion"
+                            v-on:click="up = !up">
+                        <span class="glyphicon glyphicon-chevron-up" aria-hidden="true" v-if="up == false"></span>
+                        <span class="glyphicon glyphicon-chevron-down" aria-hidden="true" v-if="up == true"></span>
+                    </button>
                 </div>
-                <div id="accordion" class="collapse">
-                    <div class="card" v-for="(rule, index) in applied_rules">
-                        <div class="card-header" id="headingOne">
-                            <h5 class="mb-0">
-                                <button class="btn btn-link align-middle" data-toggle="collapse"
-                                        v-bind:data-target="'#collapse-' + index"
-                                        aria-expanded="true" v-bind:aria-controls="'collapse-'+ index">
+                <div id="accordion" class="accordion collapse">
+                    <div class="accordion-item" v-for="(rule, index) in applied_rules">
+                        <div class="accordion-header" v-bind:id="'heading_' + index">
+
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                    v-bind:data-bs-target="'#collapse-' + index">
+                                <h5>
                                     {{index}}. applied rule {{rule.rule_name}}
-                                </button>
-                            </h5>
+                                </h5>
+                            </button>
                         </div>
 
-                        <div v-bind:id="'collapse-' + index" class="collapse" aria-labelledby="headingOne"
-                             data-parent="#accordion">
-                            <div class="card-body">
-
+                        <div v-bind:id="'collapse-' + index" class="accordion-collapse collapse"
+                             data-bs-parent="#accordion">
+                            <div class="accordion-body">
                                 <table class="table">
                                     <thead>
                                     <tr>
@@ -153,7 +167,7 @@
             </div>
             <div style="color: red">{{error}}</div>
         </main>
-        <div id="graph" class="graph border"></div>
+        <div id="graph" class="graph border-end border-start"></div>
     </div>
 </div>
 
@@ -162,18 +176,72 @@
     var app = new Vue({
         el: '#app',
         data: {
-            expressions: [
-                {value: 'John plays football or chess'},
-                {value: 'When it is raining, John plays not football'},
-                {value: 'It is raining'}
-            ],
-            to_be_shown: 'John plays not football',
+            expressions: [],
+            to_be_shown: null,
             response: '',
             error: '',
             applied_rules: [],
-            up: true
+            up: true,
+            current_tab: 'Normal Examples',
+            tabs: [
+                {
+                    tab_name: 'Normal Examples',
+                    examples: [
+                        {
+                            name: 'standard',
+                            expressions: [
+                                {value: 'John plays football or chess'},
+                                {value: 'When it is raining, John plays not football'},
+                                {value: 'It is raining'}
+                            ],
+                            to_be_shown: 'John plays not football',
+                        }
+                    ]
+                },
+                {
+                    tab_name: 'Syllogism',
+                    examples: [
+                        {
+                            name: 'standard',
+                            expressions: [
+                                {value: 'all persons are mortal'},
+                                {value: 'all philosophers are persons'},
+                            ],
+                            to_be_shown: 'all philosophers are mortal',
+                        },
+                        {
+                            name: 'standard_2',
+                            expressions: [
+                                {value: 'All humans are mortal'},
+                                {value: 'All Greeks are human'},
+                            ],
+                            to_be_shown: 'Therefore, all greeks are mortal',
+                        }
+                    ]
+                }
+            ],
+        },
+        created() {
+            console.log("Created")
+            for (let i = 0; i < this.tabs.length; i++) {
+                tab = this.tabs[i]
+                if (tab.tab_name === this.current_tab) {
+                    this.expressions = tab.examples[0].expressions
+                    this.to_be_shown = tab.examples[0].to_be_shown
+                }
+            }
         },
         methods: {
+            change_tab(tab, idx) {
+                if (idx < 0)
+                    idx = 0
+                this.current_tab = tab.tab_name
+                this.expressions = tab.examples[idx].expressions
+                this.to_be_shown = tab.examples[idx].to_be_shown
+
+                let myDropdown = document.getElementById(tab.tab_name)
+                myDropdown.classList.remove("show");
+            },
             remove_field(index) {
                 this.expressions.splice(index, 1);
             },

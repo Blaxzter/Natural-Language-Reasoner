@@ -1,7 +1,7 @@
 from logics.Constants import *
 from logics.senteces.BaseExpression import BaseExpression
 from logics.senteces.ConnectedExpression import ConnectedExpression
-from logics.senteces.Syllogism import SyllogismExpression
+from logics.senteces.SyllogismExpression import SyllogismExpression
 from logics.senteces.WhenExpression import WhenExpression
 from utils.utils import tokenize
 

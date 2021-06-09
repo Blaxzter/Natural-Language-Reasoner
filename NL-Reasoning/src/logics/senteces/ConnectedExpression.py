@@ -1,4 +1,4 @@
-from logics.Constants import connection_keywords, separator
+from logics.Constants import connection_keywords, separator, de_morgen_expression
 from logics.Expression import Expression
 from utils.utils import tokenize
 
@@ -9,6 +9,11 @@ class ConnectedExpression(Expression):
 
         if len(args) == 1:
             super().__init__(args[0])
+
+            if self.tokens[0] == de_morgen_expression:
+                self.negated = True
+                self.tokens = self.tokens[1:]
+
             self.left_expression = None
             self.right_expression = None
 
@@ -33,8 +38,11 @@ class ConnectedExpression(Expression):
             self.right_expression = args[2]
             self.connection_keyword = args[3]
             self.tokens = tokenize(
-                f'{"neither" if self.negated else ""}{self.left_expression.get_string_rep()} {self.connection_keyword} {self.right_expression.get_string_rep()}'
+                f'{self.left_expression.get_string_rep()} {self.connection_keyword} {self.right_expression.get_string_rep()}'
             )
+
+    def get_string_rep(self):
+        return f'{"neither " if self.negated else ""}{separator.join(self.tokens)}'
 
     def reverse_expression(self):
         return ConnectedExpression(

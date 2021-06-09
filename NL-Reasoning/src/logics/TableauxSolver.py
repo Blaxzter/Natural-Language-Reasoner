@@ -10,10 +10,10 @@ from visualization.TreeGenerator import TreeGenerator
 class TableauxSolver:
 
     def __init__(self, hypothesis, thesis):
-
         self.hypothesis: List[Expression] = hypothesis
         self.thesis: Expression = thesis
         self.applied_rules = []
+        self.list_of_new_objects = []
         self.solve_tree = None
 
     def proof(self):
@@ -73,7 +73,7 @@ class TableauxSolver:
                 if applied_rule in applied_rules:
                     continue
 
-                branches = rule(curr_clause)
+                branches = rule(curr_clause, clauses, self.list_of_new_objects)
                 new_nodes = None
 
                 if len(branches) != 0:

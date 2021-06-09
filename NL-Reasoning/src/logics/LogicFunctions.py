@@ -1,8 +1,9 @@
 import copy
 from collections import defaultdict
-from typing import Any, Dict, Callable
+from typing import Any, Dict, Callable, List
 
 from logics.Expression import Expression
+from logics.senteces.SyllogismExpression import SyllogismExpression
 from logics.senteces.BaseExpression import BaseExpression
 from logics.senteces.ConnectedExpression import ConnectedExpression
 from logics.senteces.WhenExpression import WhenExpression
@@ -15,8 +16,15 @@ from utils.utils import swap_exclamation_marks
 # In the case of a and b or c and d it would be like this (a and b) or (c and d) and i
 # dont think you can apply the and rule here 
 
+def create_new_object(referenced_object, list_of_new_objects):
+    for i in range(10000):
+        new_object = f'{referenced_object}_{i}'
+        if new_object not in list_of_new_objects:
+            list_of_new_objects.append(new_object)
+            return new_object
+    raise Exception("We dont have any new objects left... sorry.")
 
-def and_rule(clause: ConnectedExpression) -> defaultdict:
+def and_rule(clause: ConnectedExpression, *args) -> defaultdict:
     new_clauses = defaultdict(list)
 
     if type(clause) is not ConnectedExpression:
@@ -31,7 +39,7 @@ def and_rule(clause: ConnectedExpression) -> defaultdict:
     return new_clauses
 
 
-def or_rule(clause: ConnectedExpression) -> defaultdict:
+def or_rule(clause: ConnectedExpression, *args) -> defaultdict:
     new_clauses = defaultdict(list)
 
     if type(clause) is not ConnectedExpression:
@@ -46,7 +54,7 @@ def or_rule(clause: ConnectedExpression) -> defaultdict:
     return new_clauses
 
 
-def when_rule(clause: WhenExpression):
+def when_rule(clause: WhenExpression, *args):
     new_clauses = defaultdict(list)
 
     if type(clause) is not WhenExpression:
@@ -59,7 +67,7 @@ def when_rule(clause: WhenExpression):
     return new_clauses
 
 
-def de_morgan_Law(clause: ConnectedExpression) -> defaultdict:
+def de_morgan_Law(clause: ConnectedExpression, *args) -> defaultdict:
     new_clauses = defaultdict(list)
 
     if type(clause) is not ConnectedExpression:
@@ -86,8 +94,97 @@ def de_morgan_Law(clause: ConnectedExpression) -> defaultdict:
     return new_clauses
 
 
+def syllogism_rule_1(clause: SyllogismExpression, *args) -> defaultdict:
+    new_clauses = defaultdict(list)
+    if type(clause) is not SyllogismExpression:
+        return new_clauses
+
+    if clause.syllogism_keyword[0] != 'all':
+        return new_clauses
+
+    # Go over each class and search for a matching syllogism expression
+    for comp_clause in args[0]:
+        if type(comp_clause) is not SyllogismExpression:
+            continue
+        if not comp_clause.is_individual:
+            continue
+
+        if clause.object != comp_clause.subject:
+            continue
+
+        new_clauses[0] = [SyllogismExpression(
+            False,
+            True,
+            comp_clause.individual_keyword,
+            comp_clause.object,
+            clause.subject,
+        )]
+        break
+    return new_clauses
+
+
+def syllogism_rule_2(clause: SyllogismExpression, *args) -> defaultdict:
+    new_clauses = defaultdict(list)
+    if type(clause) is not SyllogismExpression:
+        return new_clauses
+
+    if clause.syllogism_keyword[0] != 'some':
+        return new_clauses
+
+    first_individual_keyword = ['is', 'a']
+    second_individual_keyword = ['is', 'a']
+    if 'not' in clause.syllogism_keyword[1]:
+        second_individual_keyword.insert(1, 'not')
+
+    new_clauses[0] += [SyllogismExpression(
+        False,
+        True,
+        first_individual_keyword,
+        create_new_object(clause.object, args[2]),
+        clause.object
+    )]
+    new_clauses[0] += [SyllogismExpression(
+        False,
+        True,
+        second_individual_keyword,
+        create_new_object(clause.subject, args[2]),
+        clause.subject
+    )]
+    return new_clauses
+
+
+def syllogism_rule_3(clause: SyllogismExpression, *args) -> defaultdict:
+    new_clauses = defaultdict(list)
+    if type(clause) is not SyllogismExpression:
+        return new_clauses
+
+    if clause.syllogism_keyword[0] != 'no':
+        return new_clauses
+
+    # Go over each class and search for a matching syllogism expression
+    for comp_clause in args[0]:
+        if type(comp_clause) is not SyllogismExpression:
+            continue
+        if not comp_clause.is_individual:
+            continue
+
+        if clause.object != comp_clause.subject:
+            continue
+
+        individual_keyword = comp_clause.individual_keyword
+        individual_keyword.insert(1, 'not')
+        new_clauses[0] = [SyllogismExpression(
+            False,
+            True,
+            individual_keyword,
+            comp_clause.subject,
+            clause.subject,
+        )]
+        break
+    return new_clauses
+
 # Order is important, try to not branch to early
-rule_set: Dict[Any, Callable[[Any], Dict[Any, Expression]]] = dict(
+rule_set: Dict[Any, Callable[[Any, List, List], Dict[Any, Expression]]] = dict(
     de_Morgan_Law = de_morgan_Law,
     and_rule = and_rule,
     or_rule = or_rule,
