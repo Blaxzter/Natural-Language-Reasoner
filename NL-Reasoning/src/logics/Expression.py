@@ -1,10 +1,11 @@
 from typing import List
 
-from logics.Constants import connection_keywords
-from utils.utils import tokenize, detect_sentence_structure
+from logics.Constants import connection_keywords, complete_negation, separator
+from utils.utils import tokenize
+import abc
 
 
-class Expression:
+class Expression(metaclass=abc.ABCMeta):
     id_counter = 0
 
     def __init__(self, hypothesis):
@@ -12,8 +13,7 @@ class Expression:
         if hypothesis is None or (type(hypothesis) is not str and type(hypothesis) is not list):
             raise ValueError("A hypothesis needs to be of type string or token list and can't be empty.")
 
-        self.id = Expression.id_counter
-        Expression.id_counter += 1
+        self.count_id()
 
         if type(hypothesis) is str:
             self.init_hypo = hypothesis.lower()  # Only use lower case
@@ -22,7 +22,16 @@ class Expression:
             self.init_hypo = " ".join(hypothesis)
             self.tokens = hypothesis
 
+        self.negated = False
+        if complete_negation in self.init_hypo:
+            self.negated = True
+            self.tokens = self.tokens[6:]
+
         self.split_references()
+
+    def count_id(self):
+        self.id = Expression.id_counter
+        Expression.id_counter += 1
 
     def split_references(self):
         """
@@ -44,8 +53,22 @@ class Expression:
 
                 self.tokens = left_tokens + [reference] + base_tokens + right_tokens
 
+    @abc.abstractmethod
+    def reverse_expression(self):
+        pass
+
+    @abc.abstractmethod
+    def copy(self):
+        pass
+
+    def contains(self, word):
+        if word in self.tokens:
+            return True
+        else:
+            return False
+
     def get_string_rep(self):
-        return self.init_hypo
+        return separator.join(self.tokens)
 
     def __str__(self):
         return str(self.tokens)
@@ -55,34 +78,3 @@ class Expression:
 
     def __len__(self):
         return len(self.tokens)
-
-    def is_applicable(self, param):
-        # Simple structure expected for now explanation further down for now just a in check
-        # TODO more elaborate // Add hierarchical structure
-
-        if self.is_base_expression:
-            return False
-        if param == 'deMorgan':
-            if self.contains('!') and self.contains('('):
-                return True
-
-        return param in self.tokens
-
-    def get_applicable_token(self, split_token):
-        # Simple structure expected for now explanation further down for now just a in check
-        # TODO more elaborate // Add hierarchical structure
-        if split_token == 'and' or split_token == 'or':
-            return self.tokens.index(split_token)
-        elif split_token == 'when' or split_token == 'if':
-            # Probably dont want to support hierarchical structures with when expression
-            return self.tokens.index(',')
-        elif split_token == 'DeMorgan':
-            return self.tokens.index('!(')
-
-        raise NotImplementedError("The rule has not been implemented yet.")
-
-    def contains(self, word):
-        if word in self.tokens:
-            return True
-        else:
-            return False

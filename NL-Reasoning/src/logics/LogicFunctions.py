@@ -1,8 +1,11 @@
-
+import copy
 from collections import defaultdict
 from typing import Any, Dict, Callable
 
 from logics.Expression import Expression
+from logics.senteces.BaseExpression import BaseExpression
+from logics.senteces.ConnectedExpression import ConnectedExpression
+from logics.senteces.WhenExpression import WhenExpression
 from utils.utils import swap_exclamation_marks
 
 
@@ -13,120 +16,79 @@ from utils.utils import swap_exclamation_marks
 # dont think you can apply the and rule here 
 
 
-def simple_split_rule(clause: Expression, split_token: str):
-    # if the rule is not applicable then return empty list
-    if not clause.is_applicable(split_token):
-        return []
-
-    index_of_rule = clause.get_applicable_token(split_token)
-    return [Expression(clause.tokens[:index_of_rule]), Expression(clause.tokens[index_of_rule + 1:])]
-
-
-def and_rule(clause: Expression) -> defaultdict:
+def and_rule(clause: ConnectedExpression) -> defaultdict:
     new_clauses = defaultdict(list)
 
-    split_token = 'and'
-    split_expressions = simple_split_rule(clause, split_token)
-    if len(split_expressions) != 0:
-        new_clauses[0] += split_expressions
-    return new_clauses
-
-
-def or_rule(clause: Expression) -> defaultdict:
-    new_clauses = defaultdict(list)
-
-    split_token = 'or'
-    split_expressions = simple_split_rule(clause, split_token)
-    for i, split_expression in enumerate(split_expressions):
-        new_clauses[i].append(split_expression)
-    return new_clauses
-
-
-def when_rule(clause: Expression):
-    new_clauses = defaultdict(list)
-
-    if not (clause.is_applicable('when') or clause.is_applicable('if')):
-        return new_clauses
-    elif clause.is_applicable('when'):
-        split_index = clause.get_applicable_token('when')
-    elif clause.is_applicable('if'):
-        split_index = clause.get_applicable_token('if')
-
-    left_tokens = list(clause.tokens[:split_index])
-    right_tokens = list(clause.tokens[split_index + 1:])
-
-    if 'when' in left_tokens:
-        when_token = left_tokens
-        not_when_token = right_tokens
-    elif 'if' in left_tokens:
-        when_token = left_tokens
-        not_when_token = right_tokens
-    else:
-        not_when_token = left_tokens
-        when_token = right_tokens
-
-    if 'when' in when_token:
-        when_token.remove('when')
-    else:
-        when_token.remove('if')
-
-    when_expression = Expression(when_token)
-    when_expression.reverse_expression()
-    new_clauses[0].append(when_expression)
-    new_clauses[1].append(Expression(not_when_token))
-    return new_clauses
-
-
-def de_Morgan_Law(clause: Expression) -> defaultdict:
-    new_clauses = defaultdict(list)
-
-    if not clause.is_applicable('deMorgan'):
+    if type(clause) is not ConnectedExpression:
         return new_clauses
 
-    if clause.contains('and'):
-        split_index = clause.get_applicable_token('and')
-        left_tokens = list(clause.tokens[:split_index])
-        right_tokens = list(clause.tokens[split_index+1:])
+    if clause.negated or clause.connection_keyword != 'and':
+        return new_clauses
 
-        new_right_tokens = list(left_tokens[:-1])
-        new_right_tokens.extend(right_tokens)
-        left_tokens.extend([')'])
-        # complete_sentence = list(left_tokens)
-        # complete_sentence.extend(new_right_tokens)
-        left_tokens = swap_exclamation_marks(left_tokens)
-        new_right_tokens = swap_exclamation_marks(new_right_tokens)
-        new_clauses[0].append(Expression(left_tokens))
-        new_clauses[1].append(Expression(new_right_tokens))
+    new_clauses[0] += [clause.left_expression.copy()]
+    new_clauses[0] += [clause.right_expression.copy()]
 
+    return new_clauses
+
+
+def or_rule(clause: ConnectedExpression) -> defaultdict:
+    new_clauses = defaultdict(list)
+
+    if type(clause) is not ConnectedExpression:
+        return new_clauses
+
+    if clause.negated is True or clause.connection_keyword != 'or':
+        return new_clauses
+
+    new_clauses[0] = [clause.left_expression.copy()]
+    new_clauses[1] = [clause.right_expression.copy()]
+
+    return new_clauses
+
+
+def when_rule(clause: WhenExpression):
+    new_clauses = defaultdict(list)
+
+    if type(clause) is not WhenExpression:
+        return new_clauses
+
+    copy_of_when_exp = clause.when_expression.reverse_expression()
+    new_clauses[0].append(copy_of_when_exp)
+
+    new_clauses[1].append(clause.not_when_expression)
+    return new_clauses
+
+
+def de_morgan_Law(clause: ConnectedExpression) -> defaultdict:
+    new_clauses = defaultdict(list)
+
+    if type(clause) is not ConnectedExpression:
+        return new_clauses
+
+    if clause.negated is False:
+        return new_clauses
+
+    de_morgen = ConnectedExpression(
+        not clause.negated,
+        clause.left_expression.reverse_expression(),
+        clause.right_expression.reverse_expression(),
+        "or" if clause.connection_keyword == "and" else "and"
+    )
+
+    if clause.connection_keyword == 'and':
+        new_clauses[0].append(de_morgen.left_expression)
+        new_clauses[1].append(de_morgen.right_expression)
 
     if clause.contains('or'):
-        split_index = clause.get_applicable_token('or')
-        left_tokens = list(clause.tokens[:split_index])
-        right_tokens = list(clause.tokens[split_index + 1:])
-
-        new_right_tokens = list(left_tokens[:-1])
-        new_right_tokens.extend(right_tokens)
-        left_tokens.extend([')'])
-        # complete_sentence = list(left_tokens)
-        # complete_sentence.extend(new_right_tokens)
-
-        left_tokens = swap_exclamation_marks(left_tokens)
-        new_right_tokens = swap_exclamation_marks(new_right_tokens)
-        # left_tokens = Expression(left_tokens)
-        # new_right_tokens = Expression(new_right_tokens)
-        # new_clauses[0].append(Expression(left_tokens))
-        # new_clauses[1].append(Expression(new_right_tokens))
-        result = [Expression(left_tokens), Expression(new_right_tokens)]
-        if len(left_tokens) != 0 and len(new_right_tokens) != 0:
-            new_clauses[0] += result
+        new_clauses[0].append(de_morgen.left_expression)
+        new_clauses[0].append(de_morgen.right_expression)
 
     return new_clauses
-
 
 
 # Order is important, try to not branch to early
-rule_set: Dict[Any, Callable[[Expression], Dict[Any, Expression]]] = dict(
-    de_Morgan_Law = de_Morgan_Law,
+rule_set: Dict[Any, Callable[[Any], Dict[Any, Expression]]] = dict(
+    de_Morgan_Law = de_morgan_Law,
     and_rule = and_rule,
     or_rule = or_rule,
     when_rule = when_rule,

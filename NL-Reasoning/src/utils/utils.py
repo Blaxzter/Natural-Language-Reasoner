@@ -1,3 +1,5 @@
+
+
 def tokenize(sentence: str):
     tokens = sentence.split(" ")
     ret_tokens = []

@@ -2,6 +2,7 @@ from typing import List
 
 from logics.Expression import Expression
 from logics.LogicFunctions import rule_set
+from logics.senteces.BaseExpression import BaseExpression
 from visualization.AppliedRule import AppliedRule
 from visualization.TreeGenerator import TreeGenerator
 
@@ -20,8 +21,8 @@ class TableauxSolver:
             clauses = []
             for claus in self.hypothesis:
                 clauses.append(claus)
-            self.thesis.reverse_expression_mark()
-            clauses.append(self.thesis)
+            neg_thesis = self.thesis.reverse_expression()
+            clauses.append(neg_thesis)
             self.solve_tree = TreeGenerator(clauses)
             result = self.recursive_proof(clauses, [], parent = self.solve_tree.root_node)
         except RuntimeError as e:
@@ -30,10 +31,11 @@ class TableauxSolver:
         return result
 
     @staticmethod
-    def check_for_tautology(hypothesis: Expression, clauses: List[Expression]):
+    def check_for_tautology(hypothesis: BaseExpression, clauses: List[Expression]):
         for clause in clauses:
-            if clause == hypothesis:
+            if clause == hypothesis or type(clause) != BaseExpression:
                 continue
+
             if hypothesis.is_tautologie_of(clause):
                 return True, clause
         return False, None
@@ -41,6 +43,8 @@ class TableauxSolver:
     def recursive_proof(self, clauses, applied_rules, parent = None) -> bool:
         # Check if we have a tautology in this branch
         for i, curr_clause in enumerate(clauses):
+            if type(curr_clause) != BaseExpression:
+                continue
 
             res, matched_clause = TableauxSolver.check_for_tautology(curr_clause, clauses)
             if res:

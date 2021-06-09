@@ -1,5 +1,6 @@
 from logics.Expression import Expression
 from logics.TableauxSolver import TableauxSolver
+from logics.senteces.Helper import create_expression
 
 
 class NaturalTableauxSolver:
@@ -7,9 +8,9 @@ class NaturalTableauxSolver:
     def __init__(self, clauses, to_be_shown):
         Expression.id_counter = 0
         self.expressions = [
-            Expression(clause) for clause in clauses
+            create_expression(clause) for clause in clauses
         ]
-        self.to_be_shown = Expression(to_be_shown)
+        self.to_be_shown = create_expression(to_be_shown)
 
         self.solver = TableauxSolver(self.expressions, self.to_be_shown)
 
