@@ -24,6 +24,7 @@ def create_new_object(referenced_object, list_of_new_objects):
             return new_object
     raise Exception("We dont have any new objects left... sorry.")
 
+
 def and_rule(clause: ConnectedExpression, *args) -> defaultdict:
     new_clauses = defaultdict(list)
 
@@ -229,10 +230,11 @@ def syllogism_reverse_rule(clause: SyllogismExpression, *args):
 
 # Order is important, try to not branch to early
 rule_set: Dict[Any, Callable[[Any, List, List], Dict[Any, Expression]]] = dict(
-    de_Morgan_Law = de_morgan_Law,
     and_rule = and_rule,
+    de_Morgan_Law = de_morgan_Law,
     or_rule = or_rule,
     when_rule = when_rule,
+
     syllogism_reverse_rule = syllogism_reverse_rule,
     syllogism_rule_1 = syllogism_rule_1,
     syllogism_rule_2 = syllogism_rule_2,

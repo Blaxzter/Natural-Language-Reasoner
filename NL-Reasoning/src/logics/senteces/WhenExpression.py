@@ -64,7 +64,7 @@ class WhenExpression(Expression):
         return WhenExpression(
             not self.negated,
             self.when_expression,
-            self.not_when_token,
+            self.not_when_expression,
             self.when_keyword,
             self.when_split_token
         )

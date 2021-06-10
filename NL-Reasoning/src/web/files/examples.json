@@ -47,5 +47,34 @@
         "to_be_shown": "Therefore, all greeks are mortal"
       }
     ]
+  },
+  {
+    "tab_name": "My cool new tab",
+    "examples": [
+      {
+        "name": "My first example",
+        "expressions": [
+          {
+            "value": "all persons are mortal"
+          },
+          {
+            "value": "all philosophers are persons"
+          }
+        ],
+        "to_be_shown": "all philosophers are mortal"
+      },
+      {
+        "name": "My first example 2",
+        "expressions": [
+          {
+            "value": "all persons are mortal"
+          },
+          {
+            "value": "all philosophers are persons"
+          }
+        ],
+        "to_be_shown": "all philosophers are mortal"
+      }
+    ]
   }
 ]

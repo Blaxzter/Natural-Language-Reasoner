@@ -7,6 +7,7 @@ from pyramid.request import Request
 from pyramid.response import Response, FileResponse
 
 from logics.NaturalTableauxSolver import NaturalTableauxSolver
+from logics.senteces.Helper import create_expression, create_expression_representation
 
 
 def get_main_page(request):
@@ -29,6 +30,23 @@ def get_file(request):
         content_type = 'application/json'
     )
     return response
+
+
+def get_language_request(request: Request):
+    request = json.loads(request.body.decode("utf-8"))
+    sentence = request['sentence']
+
+    try:
+        expression = create_expression(sentence)
+        representation = create_expression_representation(expression)
+
+        response = json.dumps(representation)
+        return Response(response)
+    except Exception as err:
+        print(err)
+        response = Response(str(err))
+        response.status_int = 500
+        return response
 
 
 def get_solve_request(request: Request):
@@ -58,9 +76,11 @@ def start_web_server():
         config.add_route('main', '/')
         config.add_route('solve-request', '/solve-request')
         config.add_route('examples', '/examples')
+        config.add_route('language-request', '/language-request')
         config.add_view(get_main_page, route_name='main')
         config.add_view(get_solve_request, route_name='solve-request')
-        config.add_view(get_file, route_name='examples')
+        config.add_view(get_language_request, route_name='language-request')
+        config.add_view(get_file, route_name='examples', http_cache = 0)
 
         app = config.make_wsgi_app()
     server = make_server('0.0.0.0', 6543, app)

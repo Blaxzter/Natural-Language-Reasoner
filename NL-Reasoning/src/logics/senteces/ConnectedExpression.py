@@ -11,7 +11,7 @@ class ConnectedExpression(Expression):
             super().__init__(args[0])
 
             if self.tokens[0] == de_morgen_expression:
-                self.negated = True
+                self.negated = not self.negated
                 self.tokens = self.tokens[1:]
 
             self.left_expression = None
