@@ -77,6 +77,7 @@ def start_web_server():
         config.add_route('solve-request', '/solve-request')
         config.add_route('examples', '/examples')
         config.add_route('language-request', '/language-request')
+
         config.add_view(get_main_page, route_name='main')
         config.add_view(get_solve_request, route_name='solve-request')
         config.add_view(get_language_request, route_name='language-request')

@@ -5,10 +5,10 @@
     <title>Natural Language Prover</title>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.2"></script>
+    <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
     <script src="//d3js.org/d3.v5.min.js"></script>
     <script src="https://unpkg.com/@hpcc-js/wasm@0.3.11/dist/index.min.js"></script>
     <script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js"></script>
@@ -82,12 +82,14 @@
 
             <ul class="nav nav-pills nav-fill pb-5" id="tab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="reasoner-tab" v-on:click="change_page('reasoner')" type="button" role="tab" aria-controls="reasoner" aria-selected="false">
+                    <button class="nav-link active border" id="reasoner-tab" v-on:click="change_page('reasoner')" type="button"
+                            role="tab" aria-controls="reasoner" aria-selected="false">
                         Reasoner
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="language-tab" v-on:click="change_page('language')" type="button" role="tab" aria-controls="language" aria-selected="false">
+                    <button class="nav-link border" id="language-tab" v-on:click="change_page('language')" type="button"
+                            role="tab" aria-controls="language" aria-selected="false">
                         Language Check
                     </button>
                 </li>
@@ -206,13 +208,22 @@
                     <fieldset name="form" class="list-group p-5 border">
                         <div class="mb-3">
                             <span class="form-label">Test sentence:</span>
-                            <input type="text" placeholder="Next Expression" class="form-control pt-3" v-bind:value="sentence"/>
+                            <input type="text" placeholder="Next Expression" class="form-control pt-3"
+                                   v-model:value="sentence"/>
                         </div>
                         <button type="button" class="btn btn-primary" v-on:click="language_request"
                                 style="margin-top: 8px;">Check
                         </button>
                     </fieldset>
-                    <p>{{language_output}}</p>
+
+                    <div class="container-fluid d-flex flex-row p-4 align-content-center">
+                        <div v-for="part of language_output" v-if="part.type != -1 || part.name == true" class="p-2 m-2 rounded align-middle"
+                             v-bind:class="{'bg-primary': part.type == 6, 'bg-secondary': part.type == 4, 'bg-danger': part.type == -1, 'bg-info': part.type == 5}">
+                            <h5>{{part.type == -1 ? "¬" : part.name}}</h5>
+                            <p v-if="part.tokens">{{part.tokens}}</p>
+                        </div>
+                    </div>
+                    {{language_output}}
                 </div>
             </div>
 
@@ -223,6 +234,7 @@
 
 </body>
 <script>
+    var router = new VueRouter({});
     var app = new Vue({
         el: '#app',
         data: {
@@ -238,6 +250,11 @@
             language_output: ''
         },
         mounted() {
+            if (window.location.hash === "#/" || window.location.hash === "/")
+                router.push("reasoner")
+            if (window.location.hash === "#/language")
+                this.change_page("language")
+
             axios
                 .get('http://localhost:6543/examples')
                 .then(response => {
@@ -260,10 +277,11 @@
                 if (to_page === "reasoner") {
                     reasoner_panel.classList.add("show");
                     reasoner_panel_tab.classList.add("active");
-                }
-                else {
+                    router.push("reasoner")
+                } else {
                     language_panel.classList.add("show");
                     language_panel_tab.classList.add("active");
+                    router.push("language")
                 }
             },
             change_tab(tab, idx) {
@@ -287,14 +305,13 @@
             },
             language_request() {
                 this.error = ''
+                console.log(this.sentence)
                 // GET /someUrl
                 let data = {sentence: this.sentence};
                 this.$http.post('/language-request', data).then(response => {
-                    console.log(response)
-
-                    // get body data
+                     console.log(this.sentence)
+                     // get body data
                     this.language_output = response.body;
-
                 }, response => {
                     // error callback
                     this.error = response

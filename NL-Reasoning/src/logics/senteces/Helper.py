@@ -31,38 +31,27 @@ def create_expression_representation(expression, ret_list = None):
 
     if type(expression) == SyllogismExpression:
         ret_list.append(dict(
-            type = -1,
-            name = expression.negated
-        ))
-        ret_list.append(dict(
             type = 0,
-            name = "Syllogism"
+            name = "Syllogism",
+            tokens = separator.join(expression.tokens)
         ))
         return ret_list
     elif type(expression) == ConnectedExpression:
-        ret_list.append(dict(
-            type = -1,
-            name = expression.negated
-        ))
         create_expression_representation(expression.left_expression, ret_list)
         ret_list.append(dict(
-            type = 6,
+            type = 5,
             name = expression.connection_keyword
         ))
-        create_expression_representation(expression.left_expression, ret_list)
+        create_expression_representation(expression.right_expression, ret_list)
         return ret_list
     elif type(expression) == WhenExpression:
         ret_list.append(dict(
-            type = -1,
-            name = expression.negated
-        ))
-        ret_list.append(dict(
-            type = 6,
+            type = 4,
             name = expression.when_keyword
         ))
         create_expression_representation(expression.when_expression, ret_list)
         ret_list.append(dict(
-            type = 6,
+            type = 4,
             name = expression.when_split_token
         ))
         create_expression_representation(expression.not_when_expression, ret_list)
@@ -70,12 +59,9 @@ def create_expression_representation(expression, ret_list = None):
 
     elif type(expression) == BaseExpression:
         ret_list.append(dict(
-            type = -1,
-            name = expression.negated
-        ))
-        ret_list.append(dict(
             type = 6,
-            name = "Base Expression"
+            name = "Base Expression",
+            tokens = separator.join(expression.tokens)
         ))
         return ret_list
 
