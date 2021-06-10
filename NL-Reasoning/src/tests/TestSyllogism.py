@@ -3,7 +3,7 @@ from graphviz import Source
 
 if __name__ == '__main__':
     expressions = [
-        "All humans are mortal.",
+        "All humans are mortal",
         "All Greeks are human",
     ]
     to_be_shown = "Therefore, all greeks are mortal"

@@ -1,0 +1,51 @@
+[
+  {
+    "tab_name": "Normal Examples",
+    "examples": [
+      {
+        "name": "standard",
+        "expressions": [
+          {
+            "value": "John plays football or chess"
+          },
+          {
+            "value": "When it is raining, John plays not football"
+          },
+          {
+            "value": "It is raining"
+          }
+        ],
+        "to_be_shown": "John plays not football"
+      }
+    ]
+  },
+  {
+    "tab_name": "Syllogism",
+    "examples": [
+      {
+        "name": "Philospher Examaple",
+        "expressions": [
+          {
+            "value": "all persons are mortal"
+          },
+          {
+            "value": "all philosophers are persons"
+          }
+        ],
+        "to_be_shown": "all philosophers are mortal"
+      },
+      {
+        "name": "Greeks are Mortal",
+        "expressions": [
+          {
+            "value": "All humans are mortal"
+          },
+          {
+            "value": "All Greeks are human"
+          }
+        ],
+        "to_be_shown": "Therefore, all greeks are mortal"
+      }
+    ]
+  }
+]

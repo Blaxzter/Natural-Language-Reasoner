@@ -71,7 +71,7 @@ class Expression(metaclass=abc.ABCMeta):
         return separator.join(self.tokens)
 
     def __str__(self):
-        return str(self.tokens)
+        return f'{self.negated} {self.tokens}'
 
     def __repr__(self):
         return f'{self.tokens}'

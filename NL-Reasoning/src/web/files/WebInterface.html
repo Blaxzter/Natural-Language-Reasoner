@@ -18,7 +18,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
             crossorigin="anonymous"></script>
-    <link rel="icon" href="favicon.ico" type="image/x-icon"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js" integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="icon" href="../favicon.ico" type="image/x-icon"/>
     <style>
         @import url("//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css");
 
@@ -80,7 +81,7 @@
             <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item" v-for="tab in tabs" :class="{ dropdown: tab.examples.length >= 1}"
                     role="presentation">
-                    <a v-if="tab.examples.length == 1" class="nav-link" :class="{ active: tab.tab_name == current_tab}"
+                    <a v-if="tab.examples.length == 1" class="nav-link" :class="{ active: tab.tab_name == current_tab}" href="#"
                        aria-current="page" v-on:click="change_tab(tab, -1)">{{tab.tab_name}}</a>
 
                     <a v-if="tab.examples.length > 1" class="nav-link dropdown-toggle" data-toggle="dropdown"
@@ -183,53 +184,16 @@
             applied_rules: [],
             up: true,
             current_tab: 'Normal Examples',
-            tabs: [
-                {
-                    tab_name: 'Normal Examples',
-                    examples: [
-                        {
-                            name: 'standard',
-                            expressions: [
-                                {value: 'John plays football or chess'},
-                                {value: 'When it is raining, John plays not football'},
-                                {value: 'It is raining'}
-                            ],
-                            to_be_shown: 'John plays not football',
-                        }
-                    ]
-                },
-                {
-                    tab_name: 'Syllogism',
-                    examples: [
-                        {
-                            name: 'standard',
-                            expressions: [
-                                {value: 'all persons are mortal'},
-                                {value: 'all philosophers are persons'},
-                            ],
-                            to_be_shown: 'all philosophers are mortal',
-                        },
-                        {
-                            name: 'standard_2',
-                            expressions: [
-                                {value: 'All humans are mortal'},
-                                {value: 'All Greeks are human'},
-                            ],
-                            to_be_shown: 'Therefore, all greeks are mortal',
-                        }
-                    ]
-                }
-            ],
+            tabs: [],
         },
-        created() {
-            console.log("Created")
-            for (let i = 0; i < this.tabs.length; i++) {
-                tab = this.tabs[i]
-                if (tab.tab_name === this.current_tab) {
-                    this.expressions = tab.examples[0].expressions
-                    this.to_be_shown = tab.examples[0].to_be_shown
-                }
-            }
+        mounted() {
+             axios
+              .get('http://localhost:6543/examples')
+              .then(response => {
+                  console.log(response['data'])
+                  this.tabs = response['data']
+                  this.change_tab(this.tabs[0], -1)
+              })
         },
         methods: {
             change_tab(tab, idx) {
@@ -240,7 +204,8 @@
                 this.to_be_shown = tab.examples[idx].to_be_shown
 
                 let myDropdown = document.getElementById(tab.tab_name)
-                myDropdown.classList.remove("show");
+                if (myDropdown)
+                    myDropdown.classList.remove("show");
             },
             remove_field(index) {
                 this.expressions.splice(index, 1);

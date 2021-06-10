@@ -13,9 +13,20 @@ def get_main_page(request):
     print(request)
     here = os.path.dirname(os.path.abspath(__file__))
     response = FileResponse(
-        os.path.join(here, 'WebInterface.html'),
+        os.path.join(here, 'files/WebInterface.html'),
         request = request,
         content_type = 'text/html'
+    )
+    return response
+
+
+def get_file(request):
+    print(request)
+    here = os.path.dirname(os.path.abspath(__file__))
+    response = FileResponse(
+        os.path.join(here, 'files/examples.json'),
+        request = request,
+        content_type = 'application/json'
     )
     return response
 
@@ -46,8 +57,11 @@ def start_web_server():
     with Configurator() as config:
         config.add_route('main', '/')
         config.add_route('solve-request', '/solve-request')
+        config.add_route('examples', '/examples')
         config.add_view(get_main_page, route_name='main')
         config.add_view(get_solve_request, route_name='solve-request')
+        config.add_view(get_file, route_name='examples')
+
         app = config.make_wsgi_app()
     server = make_server('0.0.0.0', 6543, app)
     print("Go to: http://localhost:6543")

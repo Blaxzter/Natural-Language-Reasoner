@@ -99,7 +99,7 @@ def syllogism_rule_1(clause: SyllogismExpression, *args) -> defaultdict:
     if type(clause) is not SyllogismExpression:
         return new_clauses
 
-    if clause.syllogism_keyword[0] != 'all':
+    if clause.syllogism_keyword is None or clause.syllogism_keyword[0] != 'all':
         return new_clauses
 
     # Go over each class and search for a matching syllogism expression
@@ -128,7 +128,7 @@ def syllogism_rule_2(clause: SyllogismExpression, *args) -> defaultdict:
     if type(clause) is not SyllogismExpression:
         return new_clauses
 
-    if clause.syllogism_keyword[0] != 'some':
+    if clause.syllogism_keyword is None or clause.syllogism_keyword[0] != 'some':
         return new_clauses
 
     first_individual_keyword = ['is', 'a']
@@ -140,14 +140,14 @@ def syllogism_rule_2(clause: SyllogismExpression, *args) -> defaultdict:
         False,
         True,
         first_individual_keyword,
-        create_new_object(clause.object, args[2]),
+        create_new_object(clause.object, args[1]),
         clause.object
     )]
     new_clauses[0] += [SyllogismExpression(
         False,
         True,
         second_individual_keyword,
-        create_new_object(clause.subject, args[2]),
+        create_new_object(clause.subject, args[1]),
         clause.subject
     )]
     return new_clauses
@@ -158,7 +158,7 @@ def syllogism_rule_3(clause: SyllogismExpression, *args) -> defaultdict:
     if type(clause) is not SyllogismExpression:
         return new_clauses
 
-    if clause.syllogism_keyword[0] != 'no':
+    if clause.syllogism_keyword is None or clause.syllogism_keyword[0] != 'no':
         return new_clauses
 
     # Go over each class and search for a matching syllogism expression
@@ -183,12 +183,60 @@ def syllogism_rule_3(clause: SyllogismExpression, *args) -> defaultdict:
         break
     return new_clauses
 
+
+def syllogism_reverse_rule(clause: SyllogismExpression, *args):
+    new_clauses = defaultdict(list)
+    if type(clause) is not SyllogismExpression:
+        return new_clauses
+
+    if not clause.negated:
+        return new_clauses
+
+    if clause.syllogism_keyword is None or clause.syllogism_keyword[0] == 'all':
+        new_clauses[0] += [SyllogismExpression(
+            False,
+            False,
+            ("some", ['are', 'not']),
+            clause.object,
+            clause.subject,
+        )]
+    elif clause.syllogism_keyword is None or clause.syllogism_keyword[0] == 'some':
+        new_clauses[0] += [SyllogismExpression(
+            False,
+            False,
+            ("no", ['is']),
+            clause.object,
+            clause.subject,
+        )]
+    elif clause.syllogism_keyword is None or clause.syllogism_keyword[0] == 'no':
+        new_clauses[0] += [SyllogismExpression(
+            False,
+            False,
+            ("some", ['are']),
+            clause.object,
+            clause.subject,
+        )]
+    elif clause.syllogism_keyword is None or clause.syllogism_keyword[0] == 'no':
+        new_clauses[0] += [SyllogismExpression(
+            False,
+            False,
+            ("all", ['are']),
+            clause.object,
+            clause.subject,
+        )]
+    return new_clauses
+
+
 # Order is important, try to not branch to early
 rule_set: Dict[Any, Callable[[Any, List, List], Dict[Any, Expression]]] = dict(
     de_Morgan_Law = de_morgan_Law,
     and_rule = and_rule,
     or_rule = or_rule,
     when_rule = when_rule,
+    syllogism_reverse_rule = syllogism_reverse_rule,
+    syllogism_rule_1 = syllogism_rule_1,
+    syllogism_rule_2 = syllogism_rule_2,
+    syllogism_rule_3 = syllogism_rule_3,
 )
 
 
