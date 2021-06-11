@@ -130,7 +130,7 @@
                         </div>
                         <div class="expression_input" class="list-group-item">
                             <label>To be shown:</label>
-                            <input type="text" v-bind:value="to_be_shown" class="form-control"/>
+                            <input type="text" v-model:value="to_be_shown" class="form-control"/>
                             <br>
                         </div>
                         <button v-on:click="send_request" type="button" class="btn btn-primary"

@@ -7,16 +7,16 @@ from utils.utils import tokenize
 
 
 def create_expression(hypothesis):
-    tokenized = tokenize(hypothesis.lower())
+    lower = hypothesis.lower()
 
-    if check_if_in(syllogism_keywords, tokenized):
-        return SyllogismExpression(tokenized)
-    if check_if_in(when_keywords, tokenized):
-        return WhenExpression(tokenized)
-    if check_if_in(connection_keywords, tokenized):
-        return ConnectedExpression(tokenized)
+    if check_if_in(syllogism_keywords, lower):
+        return SyllogismExpression(lower)
+    if check_if_in(when_keywords, lower):
+        return WhenExpression(lower)
+    if check_if_in(connection_keywords, lower):
+        return ConnectedExpression(lower)
 
-    return BaseExpression(tokenized)
+    return BaseExpression(lower)
 
 
 def create_expression_representation(expression, ret_list = None):
