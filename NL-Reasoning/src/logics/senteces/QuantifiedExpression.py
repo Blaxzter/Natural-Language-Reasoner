@@ -10,34 +10,27 @@ class PredicateExpression(Expression):
             super().__init__(args[0])
 
             self.for_all = True
+            self.quantified_sentence = None
             self.quantified_variable = None
             self.quantified_expression = None
 
 
         else:
             self.count_id()
-            self.negated = args[0]
-            self.is_individual = args[1]
 
-            self.syllogism_keyword = None
-            self.individual_keyword = None
-
-            if self.is_individual:
-                self.individual_keyword = args[2]
-            else:
-                self.syllogism_keyword = args[2]
-
-            self.object = args[3]
-            self.subject = args[4]
+            self.for_all = args[0]
+            self.quantified_sentence = args[1]
+            self.quantified_variable = args[2]
+            self.quantified_expression = args[3]
 
             self.tokens = tokenize(
-                f'{self.object} {separator.join(self.individual_keyword)} {self.subject}'
-                if self.is_individual else
+                f'{self.quantified_sentence} {separator.join(self.individual_keyword)} {self.subject}'
+                if self.for_all else
                 f'{self.syllogism_keyword[0]} {self.object} {separator.join(self.syllogism_keyword[1])} {self.subject}'
             )
 
     def reverse_expression(self):
-        return SyllogismExpression(
+        return PredicateExpression(
             not self.negated,
             self.is_individual,
             self.individual_keyword if self.is_individual else self.syllogism_keyword,
@@ -49,7 +42,7 @@ class PredicateExpression(Expression):
         return f'{"it is not the case that " if self.negated else ""}{separator.join(self.tokens)}'
 
     def copy(self):
-        return SyllogismExpression(
+        return PredicateExpression(
             self.negated,
             self.is_individual,
             self.individual_keyword if self.is_individual else self.syllogism_keyword,
