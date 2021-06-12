@@ -9,7 +9,7 @@ when_split_tokens = [',', 'then']
 
 de_morgen_expression = 'neither'
 
-syllogism_regex = "/(All|Some|No) [a-zA-Z -]+ (have|are not|are|is not a|is not an|is an|is a|is) [a-zA-Z -]+/gmi"
+syllogism_regex = "(All|Some|No) [a-zA-Z -]+ (have|are not|are|is not a|is not an|is an|is a|is) [a-zA-Z -]+"
 pluralism_keywords = ['all', 'some', 'no', 'therefore']
 individuals_keywords = ['is an', 'is a', 'is not a', 'is not an']
 syllogism_keywords = pluralism_keywords + individuals_keywords

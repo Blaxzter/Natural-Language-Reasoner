@@ -82,7 +82,8 @@
 
             <ul class="nav nav-pills nav-fill pb-5" id="tab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active border" id="reasoner-tab" v-on:click="change_page('reasoner')" type="button"
+                    <button class="nav-link active border" id="reasoner-tab" v-on:click="change_page('reasoner')"
+                            type="button"
                             role="tab" aria-controls="reasoner" aria-selected="false">
                         Reasoner
                     </button>
@@ -317,8 +318,8 @@
                 // GET /someUrl
                 let data = {sentence: this.sentence};
                 this.$http.post('/language-request', data).then(response => {
-                     console.log(this.sentence)
-                     // get body data
+                    console.log(this.sentence)
+                    // get body data
                     this.language_output = response.body;
                 }, response => {
                     // error callback
@@ -384,13 +385,14 @@
                     "style=\"background-color: " + this.get_color(c_type) +
                     "; border: 2px solid " + this.get_border_color(c_type) + "\">\n"
                 ret_html += "<h3 class='flex-row m-2'>" + sentence_part['name'] + "</h3>"
-                ret_html += "<div class='flex-row d-inline-flex'>"
+                ret_html += "<div class='flex-row d-inline-flex m-2'>"
+                if (sentence_part['tokens'])
+                    ret_html += "<span>" + sentence_part['tokens'] + "</span>"
                 for (let i = 0; i < sentence_part['list'].length; i++) {
                     let current_sentence_part = sentence_part['list'][i]
                     if (current_sentence_part['list'] && current_sentence_part['list'].length >= 1) {
                         ret_html += this.recursive_sentence_structure(current_sentence_part)
-                    }
-                    else {
+                    } else {
                         let cs_type = current_sentence_part['type'];
                         ret_html += "<div class=\"p-2 m-2 rounded align-middle\" " +
                             "style=\"background-color: " + this.get_color(cs_type) +
