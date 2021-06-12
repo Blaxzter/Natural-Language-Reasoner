@@ -10,7 +10,7 @@ class PredicateExpression(Expression):
             super().__init__(args[0])
 
             self.for_all = True
-            self.quantifieng
+            self.quantified_sentence = None
             self.quantified_variable = None
             self.quantified_expression = None
 
@@ -18,13 +18,13 @@ class PredicateExpression(Expression):
         else:
             self.count_id()
 
-            self.negated = args[0]
-            self.for_all = args[1]
-            self.quantified_variable = None
-            self.quantified_expression = None
+            self.for_all = args[0]
+            self.quantified_sentence = args[1]
+            self.quantified_variable = args[2]
+            self.quantified_expression = args[3]
 
             self.tokens = tokenize(
-                f'{""} {separator.join(self.individual_keyword)} {self.subject}'
+                f'{self.quantified_sentence} {separator.join(self.individual_keyword)} {self.subject}'
                 if self.for_all else
                 f'{self.syllogism_keyword[0]} {self.object} {separator.join(self.syllogism_keyword[1])} {self.subject}'
             )
