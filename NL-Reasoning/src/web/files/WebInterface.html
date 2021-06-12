@@ -217,13 +217,10 @@
                     </fieldset>
 
                     <div class="container-fluid d-flex flex-row p-4 align-content-center">
-                        <div v-for="part of language_output" v-if="part.type != -1 || part.name == true" class="p-2 m-2 rounded align-middle"
-                             v-bind:class="{'bg-primary': part.type == 6, 'bg-secondary': part.type == 4, 'bg-danger': part.type == -1, 'bg-info': part.type == 5}">
-                            <h5>{{part.type == -1 ? "¬" : part.name}}</h5>
-                            <p v-if="part.tokens">{{part.tokens}}</p>
+
+                        <div v-html="create_sentence_presentation">
                         </div>
                     </div>
-                    {{language_output}}
                 </div>
             </div>
 
@@ -262,6 +259,17 @@
                     this.tabs = response['data']
                     this.change_tab(this.tabs[0], -1)
                 })
+        },
+        computed: {
+            create_sentence_presentation() {
+                console.log("Test")
+                if (this.language_output === "")
+                    return "<div></div>"
+
+                let data_structure = this.recursive_sentence_structure(this.language_output);
+                console.log(data_structure)
+                return data_structure
+            },
         },
         methods: {
             change_page(to_page) {
@@ -344,6 +352,61 @@
             display_tree(dot_graph) {
                 d3.select("#graph").graphviz()
                     .renderDot(dot_graph);
+            },
+            get_color(type) {
+                let color = "#a5363b"
+                if (type === 0) color = "#c66432"
+                else if (type === 1) color = "#ca5e26"
+                else if (type === 2) color = "#4f7e5f"
+                else if (type === 3) color = "#586983"
+                else if (type === 4) color = "#8a538a"
+                else if (type === 5) color = "#b39986"
+                else if (type === 6) color = "#188fec"
+                return color
+            },
+            get_border_color(type) {
+                let color = "#A4262C"
+                if (type === 0) color = "#CA5010"
+                else if (type === 1) color = "#CA5010"
+                else if (type === 2) color = "#407855"
+                else if (type === 3) color = "#40587C"
+                else if (type === 4) color = "#854085"
+                else if (type === 5) color = "#867365"
+                else if (type === 6) color = "#0078d4"
+                return color
+            },
+            recursive_sentence_structure(sentence_part) {
+
+                c_type = sentence_part['type']
+
+                let ret_html = "<div " +
+                    "class=\"p-2 m-2 rounded align-middle\" " +
+                    "style=\"background-color: " + this.get_color(c_type) +
+                    "; border: 2px solid " + this.get_border_color(c_type) + "\">\n"
+                ret_html += "<h3 class='flex-row m-2'>" + sentence_part['name'] + "</h3>"
+                ret_html += "<div class='flex-row d-inline-flex'>"
+                for (let i = 0; i < sentence_part['list'].length; i++) {
+                    let current_sentence_part = sentence_part['list'][i]
+                    if (current_sentence_part['list'] && current_sentence_part['list'].length >= 1) {
+                        ret_html += this.recursive_sentence_structure(current_sentence_part)
+                    }
+                    else {
+                        let cs_type = current_sentence_part['type'];
+                        ret_html += "<div class=\"p-2 m-2 rounded align-middle\" " +
+                            "style=\"background-color: " + this.get_color(cs_type) +
+                            "; display: flex; justify-content: center; flex-direction: column; " +
+                            "border: 2px solid " + this.get_border_color(cs_type) + "\">\n"
+                        if (cs_type === -1)
+                            ret_html += "<span>¬</span>"
+                        else
+                            ret_html += "<span>" + current_sentence_part['name'] + "</span>"
+                        if (current_sentence_part['tokens'])
+                            ret_html += "<span>" + current_sentence_part['tokens'] + "</span>"
+                        ret_html += "</div>"
+                    }
+                }
+                ret_html += "</div></div>\n"
+                return ret_html
             }
         },
     })

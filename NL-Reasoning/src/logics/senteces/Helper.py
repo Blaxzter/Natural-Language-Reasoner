@@ -1,68 +1,92 @@
 from logics.Constants import *
 from logics.senteces.BaseExpression import BaseExpression
 from logics.senteces.ConnectedExpression import ConnectedExpression
+from logics.senteces.QuantifiedExpression import QuantifiedExpression
 from logics.senteces.SyllogismExpression import SyllogismExpression
 from logics.senteces.WhenExpression import WhenExpression
-from utils.utils import tokenize
 
+import re
 
 def create_expression(hypothesis):
     lower = hypothesis.lower()
 
-    if check_if_in(syllogism_keywords, lower):
-        return SyllogismExpression(lower)
-    if check_if_in(when_keywords, lower):
-        return WhenExpression(lower)
-    if check_if_in(connection_keywords, lower):
-        return ConnectedExpression(lower)
+    creating_structures = [
+        (quantified_keywords, QuantifiedExpression, None),
+        (syllogism_keywords, SyllogismExpression, syllogism_regex),
+        (when_keywords, WhenExpression, None),
+        (connection_keywords, ConnectedExpression, None),
+    ]
 
-    return BaseExpression(lower)
+    error_list = []
+
+    for creating_structure in creating_structures:
+        if check_if_in(creating_structure[0], lower):
+            if creating_structure[2] is not None:
+                if re.match(creating_structure[2], lower, re.IGNORECASE):
+                    try:
+                        expression = creating_structure[1](lower)
+                        return expression
+                    except Exception as err:
+                        error_list.append(err)
+            else:
+                try:
+                    expression = creating_structure[1](lower)
+                    return expression
+                except Exception as err:
+                    error_list.append(err)
+    try:
+        expression = BaseExpression(lower)
+        return expression
+    except Exception as err:
+        error_list.append(err)
+        return error_list
 
 
 def create_expression_representation(expression, ret_list = None):
     if ret_list is None:
-        ret_list = list()
+        ret_list = dict()
 
+    ret_list["list"] = []
     if expression.negated:
-        ret_list.append(dict(
+        ret_list["list"].append(dict(
             type = -1,
             name = expression.negated
         ))
 
     if type(expression) == SyllogismExpression:
-        ret_list.append(dict(
-            type = 0,
-            name = "Syllogism",
-            tokens = separator.join(expression.tokens)
-        ))
+        ret_list['type'] = 0
+        ret_list['name'] = "Syllogism"
+        ret_list['tokens'] = separator.join(expression.tokens)
         return ret_list
     elif type(expression) == ConnectedExpression:
-        create_expression_representation(expression.left_expression, ret_list)
-        ret_list.append(dict(
+        ret_list['type'] = 1
+        ret_list['name'] = "Connected Expression"
+        ret_list["list"].append(create_expression_representation(expression.left_expression, dict()))
+        ret_list["list"].append(dict(
             type = 5,
             name = expression.connection_keyword
         ))
-        create_expression_representation(expression.right_expression, ret_list)
+        ret_list["list"].append(create_expression_representation(expression.right_expression, dict()))
         return ret_list
     elif type(expression) == WhenExpression:
-        ret_list.append(dict(
+        ret_list['type'] = 2
+        ret_list['name'] = "Conditional Expression"
+        ret_list["list"].append(dict(
             type = 4,
             name = expression.when_keyword
         ))
-        create_expression_representation(expression.when_expression, ret_list)
-        ret_list.append(dict(
+        ret_list["list"].append(create_expression_representation(expression.when_expression, dict()))
+        ret_list["list"].append(dict(
             type = 4,
             name = expression.when_split_token
         ))
-        create_expression_representation(expression.not_when_expression, ret_list)
+        ret_list["list"].append(create_expression_representation(expression.not_when_expression, dict()))
         return ret_list
 
     elif type(expression) == BaseExpression:
-        ret_list.append(dict(
-            type = 6,
-            name = "Base Expression",
-            tokens = separator.join(expression.tokens)
-        ))
+        ret_list['type'] = 3
+        ret_list['name'] = "Basis Information"
+        ret_list['tokens'] = separator.join(expression.tokens)
         return ret_list
 
 

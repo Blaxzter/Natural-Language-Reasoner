@@ -1,4 +1,4 @@
-from logics.Constants import pluralism_keywords, separator
+from logics.Constants import pluralism_keywords, separator, individuals_keywords
 from logics.Expression import Expression
 from utils.utils import tokenize
 
@@ -24,10 +24,21 @@ class SyllogismExpression(Expression):
 
             self.individual_keyword = None
             if self.syllogism_keyword is None:
-                self.individual_keyword = self.tokens[1:-1]
+                for individuals_keyword in individuals_keywords:
+                    if individuals_keyword in self.init_hypo:
+                        key_word_token = tokenize(individuals_keyword)
+                        self.individual_keyword = key_word_token
+
+            if self.individual_keyword is None and self.syllogism_keyword is None:
+                raise Exception("wrong keyword detected")
 
             # Get the subject and object
             self.object = self.tokens[0 if self.is_individual else 1]
+
+            if self.individual_keyword:
+                if len(self.tokens) > 1 + len(self.individual_keyword) + 1:
+                    raise Exception("Tokens are to long for syllogism")
+
             self.subject = self.tokens[-1]
         else:
             self.count_id()
