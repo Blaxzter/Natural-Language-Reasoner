@@ -1,10 +1,10 @@
 from collections import defaultdict
-
+from logics.logic_functions.Rule import Rule
 from logics.LogicFunctions import create_new_object
 from logics.senteces.SyllogismExpression import SyllogismExpression
 
 
-class SyllogismRule:
+class SyllogismRule(Rule):
 
     def __init__(self):
         self.name = 'Syllogism Rule'

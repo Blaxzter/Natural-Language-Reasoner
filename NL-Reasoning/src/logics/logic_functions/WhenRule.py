@@ -1,9 +1,9 @@
 from collections import defaultdict
 from logics.senteces.WhenExpression import WhenExpression
 from logics.senteces.ConnectedExpression import ConnectedExpression
+from logics.logic_functions.Rule import Rule
 
-
-class WhenRule:
+class WhenRule(Rule):
 
     def __init__(self):
         self.name = 'When Rule'
