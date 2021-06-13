@@ -7,7 +7,7 @@ class TreeGenerator:
 
     def __init__(self, premise):
         self.graph = pydot.Dot('applied_rules', graph_type = 'graph')
-        self.root_node = pydot.Node(0, label = self.get_rule_string(premise, "Initial root", None), shape = 'none')
+        self.root_node = pydot.Node(0, id="root_node", label = self.get_rule_string(premise, "Initial root", None), shape = 'polygon', fillcolor='#1f77b4')
         self.graph.add_node(self.root_node)
         self.node_id = 1
 
@@ -15,7 +15,7 @@ class TreeGenerator:
         new_nodes = []
 
         if applied_rule.created_expressions is None:
-            new_node = pydot.Node(self.node_id, label = f'{self.get_rule_string([applied_rule.c_expression, applied_rule.matched_expression], applied_rule.rule_name, applied_rule.referenced_line)}', shape = 'none')
+            new_node = pydot.Node(self.node_id, label = f'{self.get_rule_string([applied_rule.c_expression, applied_rule.matched_expression], applied_rule.rule_name, applied_rule.referenced_line)}', shape = 'polygon', fillcolor='#1f77b4')
             self.graph.add_node(new_node)
             my_edge = pydot.Edge(parent_node.get_name(), str(self.node_id))
             self.graph.add_edge(my_edge)
@@ -23,7 +23,7 @@ class TreeGenerator:
             new_nodes.append(new_node)
         else:
             for new_exp in applied_rule.created_expressions.values():
-                new_node = pydot.Node(self.node_id, label = f'{self.get_rule_string(new_exp, applied_rule.rule_name, applied_rule.referenced_line)}', shape = 'none')
+                new_node = pydot.Node(self.node_id, label = f'{self.get_rule_string(new_exp, applied_rule.rule_name, applied_rule.referenced_line)}', shape = 'polygone', fillcolor="#1f77b4")
                 self.graph.add_node(new_node)
 
                 my_edge = pydot.Edge(parent_node.get_name(), str(self.node_id))

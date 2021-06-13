@@ -21,6 +21,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"
             integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <link rel="icon" href="../favicon.ico" type="image/x-icon"/>
     <style>
         @import url("//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css");
@@ -226,6 +227,8 @@
             </div>
 
             <div style="color: red">{{error}}</div>
+
+            <div id="tooltip" :style="{'display': tooltip_visible ? 'block' : 'none', 'top': topOffset, 'left': leftOffset}" style="position: fixed">{{tooltip_text}}</div>
         </main>
     </div>
 </div>
@@ -245,13 +248,24 @@
             current_tab: 'Normal Examples',
             tabs: [],
             sentence: 'When i love you then you love me',
-            language_output: ''
+            language_output: '',
+            tooltip_text: 'This is the story',
+            tooltip_visible: true,
+            topOffset: "0px",
+            leftOffset: "0px",
         },
         mounted() {
             if (window.location.hash === "#/" || window.location.hash === "/")
                 router.push("reasoner")
             if (window.location.hash === "#/language")
                 this.change_page("language")
+
+            window.onmousemove = (e) => {
+                var x = e.clientX,
+                    y = e.clientY;
+                this.topOffset = (y + 20) + 'px';
+                this.leftOffset = (x + 20) + 'px';
+            };
 
             axios
                 .get('/examples')
@@ -350,9 +364,27 @@
                     this.error = response
                 });
             },
+            toggle_tooltip(element, enter) {
+                this.tooltip_text = element[0].id
+                this.tooltip_visible = enter
+            },
             display_tree(dot_graph) {
-                d3.select("#graph").graphviz()
+                d3.select("#graph")
+                    .graphviz()
                     .renderDot(dot_graph);
+
+                setTimeout(() => {
+                    var nodes = d3.selectAll(".node");
+                    for (let i = 0; i < nodes._groups[0].length; i++) {
+                        c_node = nodes._groups[0][i]
+                        c_node_children = $(c_node).children()
+                        $(c_node).children("polygon")[0].setAttribute("fill", "#ffffff")
+                        for (let c = 0; c < c_node_children.length; c++) {
+                            c_node_children[c].onpointerenter = (event) => this.toggle_tooltip($(event.target).parent(), true);
+                            c_node_children[c].onpointerleave = (event) => this.toggle_tooltip($(event.target).parent(), false);
+                        }
+                    }
+                }, 1000)
             },
             get_color(type) {
                 let color = "#a5363b"
