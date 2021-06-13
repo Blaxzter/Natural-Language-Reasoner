@@ -1,6 +1,6 @@
 from typing import List
 
-from logics.Expression import Expression
+from logics.senteces.Expression import Expression
 from logics.LogicFunctions import rule_set
 from logics.senteces.BaseExpression import BaseExpression
 from visualization.AppliedRule import AppliedRule
@@ -12,7 +12,7 @@ class TableauxSolver:
     def __init__(self, hypothesis, thesis):
         self.hypothesis: List[Expression] = hypothesis
         self.thesis: Expression = thesis
-        self.applied_rules = []
+        self.applied_rules = {}
         self.list_of_new_objects = []
         self.solve_tree = None
 
@@ -54,9 +54,10 @@ class TableauxSolver:
                     referenced_line = curr_clause.id,
                     c_expression = curr_clause,
                     matched_expression = matched_clause,
+                    rule_desc_obj = dict(name="Tautologie")
                 )
-                self.applied_rules.append(applied_rule)
-                self.solve_tree.add_node(parent, applied_rule)
+                self.solve_tree.add_node(parent, applied_rule, len(self.applied_rules))
+                self.applied_rules[f"node_{len(self.applied_rules)}"] = applied_rule
                 return True
 
         # Go over each clause and check if we can apply a rule
@@ -68,19 +69,21 @@ class TableauxSolver:
                 applied_rule = AppliedRule(
                     rule_name = rule_name,
                     referenced_line = curr_clause.id,
-                    c_expression = curr_clause
+                    c_expression = curr_clause,
                 )
                 if applied_rule in applied_rules:
                     continue
 
-                branches = rule(curr_clause, clauses, self.list_of_new_objects)
+                branches, created_rule = rule(curr_clause, clauses, self.list_of_new_objects)
                 new_nodes = None
 
                 if len(branches) != 0:
                     applied_rule.created_expressions = branches
+                    if created_rule:
+                        applied_rule.rule_desc_obj = created_rule.get_explanation(applied_rule)
                     applied_rules.append(applied_rule)
-                    self.applied_rules.append(applied_rule)
-                    new_nodes = self.solve_tree.add_node(parent, applied_rule)
+                    new_nodes = self.solve_tree.add_node(parent, applied_rule, len(self.applied_rules))
+                    self.applied_rules[f"node_{len(self.applied_rules)}"] = applied_rule
                 else:
                     continue
 

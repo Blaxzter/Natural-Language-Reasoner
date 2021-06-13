@@ -1,5 +1,5 @@
-from logics.Constants import connection_keywords, separator, when_keywords, when_split_tokens
-from logics.Expression import Expression
+from logics.Constants import separator, when_keywords, when_split_tokens
+from logics.senteces.Expression import Expression
 from utils.utils import tokenize
 
 

@@ -228,7 +228,45 @@
 
             <div style="color: red">{{error}}</div>
 
-            <div id="tooltip" :style="{'display': tooltip_visible ? 'block' : 'none', 'top': topOffset, 'left': leftOffset}" style="position: fixed">{{tooltip_text}}</div>
+            <div id="tooltip" class="card"
+                 :style="{'display': tooltip_visible ? 'block' : 'none', 'top': topOffset, 'left': leftOffset}"
+                 style="position: fixed">
+                <div class="card-header">{{tooltip_header}}</div>
+                <div class="card-body">
+                    <table class="m-2">
+                        <tr style="border-bottom: 2px solid black">
+                            <td v-for="in_expression in basic_in_expressions">
+                                {{in_expression}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td v-for="out_expression in basic_out_expressions">
+                            <span v-for="out_inner_expression in out_expression">
+                                {{out_inner_expression}},
+                            </span>
+                                <span v-if="out_expressions.length > 1">|</span>
+                            </td>
+                        </tr>
+                    </table>
+                    <p>This rule applied looks like this:</p>
+                    <table class="m-2">
+                        <tr style="border-bottom: 2px solid black">
+                            <td v-for="in_expression in in_expressions">
+                                {{in_expression}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td v-for="out_expression in out_expressions">
+                            <span v-for="out_inner_expression in out_expression">
+                                {{out_inner_expression}},
+                            </span>
+                                <span v-if="out_expressions.length > 1">|</span>
+                            </td>
+                        </tr>
+                    </table>
+                    <p class="m-2">{{tooltip_description}}</p>
+                </div>
+            </div>
         </main>
     </div>
 </div>
@@ -249,8 +287,13 @@
             tabs: [],
             sentence: 'When i love you then you love me',
             language_output: '',
-            tooltip_text: 'This is the story',
-            tooltip_visible: true,
+            tooltip_header: "",
+            in_expressions: "",
+            out_expressions: "",
+            basic_in_expressions: "",
+            basic_out_expressions: "",
+            tooltip_description: "",
+            tooltip_visible: false,
             topOffset: "0px",
             leftOffset: "0px",
         },
@@ -350,6 +393,7 @@
                     this.response = response.body;
                     this.applied_rules = response.body['applied_rules']
 
+                    console.log("hey")
                     for (let applied_rule_idx in this.applied_rules) {
                         applied_rule = this.applied_rules[applied_rule_idx]
                         if (applied_rule.created_expressions) {
@@ -365,26 +409,43 @@
                 });
             },
             toggle_tooltip(element, enter) {
-                this.tooltip_text = element[0].id
+
+                if (element[0].id === "root_node") {
+                    this.tooltip_visible = false
+                    return
+                }
+
+                c_rule = this.applied_rules[element[0].id]['rule_desc_obj']
+                rule_object = JSON.parse(c_rule.replaceAll("'", '"'))
+
+                this.tooltip_header = rule_object['name']
+                this.in_expressions = rule_object['in_expression']
+                this.out_expressions = rule_object['out_expression']
+                this.basic_in_expressions = rule_object['basic_in_expression']
+                this.basic_out_expressions = rule_object['basic_out_expression']
+                this.tooltip_description = rule_object['description']
+
                 this.tooltip_visible = enter
             },
             display_tree(dot_graph) {
                 d3.select("#graph")
-                    .graphviz()
-                    .renderDot(dot_graph);
-
-                setTimeout(() => {
-                    var nodes = d3.selectAll(".node");
-                    for (let i = 0; i < nodes._groups[0].length; i++) {
-                        c_node = nodes._groups[0][i]
-                        c_node_children = $(c_node).children()
-                        $(c_node).children("polygon")[0].setAttribute("fill", "#ffffff")
-                        for (let c = 0; c < c_node_children.length; c++) {
-                            c_node_children[c].onpointerenter = (event) => this.toggle_tooltip($(event.target).parent(), true);
-                            c_node_children[c].onpointerleave = (event) => this.toggle_tooltip($(event.target).parent(), false);
+                    .graphviz({useWorker: false})
+                    .on("renderEnd", () => {
+                        console.log("Render End")
+                        var nodes = d3.selectAll(".node");
+                        for (let i = 0; i < nodes._groups[0].length; i++) {
+                            c_node = nodes._groups[0][i]
+                            c_node_children = $(c_node).children()
+                            $($(c_node_children[1]).children()[0]).children("polygon")[0].setAttribute("fill", "#ffffff")
+                            c_node_children[1].onpointerenter = (event) => {
+                                this.toggle_tooltip($(event.target).parent(), true);
+                            };
+                            c_node_children[1].onpointerleave = (event) => {
+                                this.toggle_tooltip($(event.target).parent(), false);
+                            };
                         }
-                    }
-                }, 1000)
+                    })
+                    .renderDot(dot_graph);
             },
             get_color(type) {
                 let color = "#a5363b"

@@ -1,5 +1,5 @@
 from logics.Constants import connection_keywords, separator, de_morgen_expression
-from logics.Expression import Expression
+from logics.senteces.Expression import Expression
 from utils.utils import tokenize
 
 

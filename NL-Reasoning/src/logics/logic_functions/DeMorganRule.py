@@ -12,14 +12,15 @@ class DeMorganRule(Rule):
     def get_explanation(self, applied_rule):
         return f'html rule'
 
-    def apply_rule(self, clause: ConnectedExpression, *args):
+    @staticmethod
+    def apply_rule(clause: ConnectedExpression, *args):
         new_clauses = defaultdict(list)
 
         if type(clause) is not ConnectedExpression:
-            return new_clauses
+            return new_clauses, None
 
         if clause.negated is False:
-            return new_clauses
+            return new_clauses, None
 
         de_morgen = ConnectedExpression(
             not clause.negated,
@@ -36,4 +37,4 @@ class DeMorganRule(Rule):
             new_clauses[0].append(de_morgen.left_expression)
             new_clauses[0].append(de_morgen.right_expression)
 
-        return new_clauses
+        return new_clauses, None

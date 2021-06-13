@@ -1,5 +1,5 @@
 from logics.Constants import negation_keywords
-from logics.Expression import Expression
+from logics.senteces.Expression import Expression
 from utils.utils import tokenize
 
 

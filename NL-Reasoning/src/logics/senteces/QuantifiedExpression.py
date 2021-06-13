@@ -1,5 +1,5 @@
 from logics.Constants import separator, quantified_keywords_plural, quantified_keywords_singular
-from logics.Expression import Expression
+from logics.senteces.Expression import Expression
 from utils.utils import tokenize
 
 

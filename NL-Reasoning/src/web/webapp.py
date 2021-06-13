@@ -1,5 +1,6 @@
 import os
 import json
+import traceback
 
 from wsgiref.simple_server import make_server
 from pyramid.config import Configurator
@@ -60,12 +61,12 @@ def get_solve_request(request: Request):
         nts.solve()
 
         response = json.dumps(dict(
-            applied_rules = [applied_rule.get_dict() for applied_rule in nts.get_applied_rules()],
-            dot_graph = nts.get_dot_graph()
-        ))
+            applied_rules = {i: applied_rule.get_dict() for i, applied_rule in nts.get_applied_rules().items()},
+            dot_graph = nts.get_dot_graph())
+        )
         return Response(response)
     except Exception as err:
-        print(err)
+        traceback.print_exc()
         response = Response(str(err))
         response.status_int = 500
         return response
@@ -78,10 +79,10 @@ def start_web_server():
         config.add_route('examples', '/examples')
         config.add_route('language-request', '/language-request')
 
-        config.add_view(get_main_page, route_name='main')
-        config.add_view(get_solve_request, route_name='solve-request')
-        config.add_view(get_language_request, route_name='language-request')
-        config.add_view(get_file, route_name='examples', http_cache = 0)
+        config.add_view(get_main_page, route_name = 'main')
+        config.add_view(get_solve_request, route_name = 'solve-request')
+        config.add_view(get_language_request, route_name = 'language-request')
+        config.add_view(get_file, route_name = 'examples', http_cache = 0)
 
         app = config.make_wsgi_app()
     server = make_server('0.0.0.0', 6543, app)

@@ -1,4 +1,4 @@
-from logics.Expression import Expression
+from logics.senteces.Expression import Expression
 from logics.TableauxSolver import TableauxSolver
 from logics.senteces.Helper import create_expression
 
