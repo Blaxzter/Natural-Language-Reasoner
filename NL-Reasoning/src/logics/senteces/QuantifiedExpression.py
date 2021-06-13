@@ -18,14 +18,16 @@ class QuantifiedExpression(Expression):
                 if quantified_keyword_singular in self.init_hypo:
                     self.for_all = False
                     self.quantified_sentence = tokenize(quantified_keyword_singular)
+                    break
 
             if self.quantified_sentence is None:
                 for quantified_keyword_plural in quantified_keywords_plural:
                     if quantified_keyword_plural in self.init_hypo:
                         self.quantified_sentence = tokenize(quantified_keyword_plural)
+                        break
 
             quantified_token_length = len(self.quantified_sentence)
-            self.quantified_variable = self.tokens[quantified_token_length + 1]
+            self.quantified_variable = self.tokens[quantified_token_length]
             from logics.senteces.Helper import create_expression
             self.quantified_expression = create_expression(separator.join(self.tokens[quantified_token_length + 1:]))
 
@@ -38,6 +40,7 @@ class QuantifiedExpression(Expression):
             self.quantified_expression = args[3]
 
             self.tokens = tokenize(
+                f'{"it is not the case that " if self.negated else ""}'
                 f'{self.quantified_sentence} {self.quantified_variable} {self.quantified_expression}'
             )
 

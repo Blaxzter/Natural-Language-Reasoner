@@ -57,8 +57,10 @@ class SyllogismExpression(Expression):
             self.subject = args[4]
 
             self.tokens = tokenize(
+                f'{"it is not the case that " if self.negated else ""}'
                 f'{self.object} {separator.join(self.individual_keyword)} {self.subject}'
                 if self.is_individual else
+                f'{"it is not the case that " if self.negated else ""}'
                 f'{self.syllogism_keyword[0]} {self.object} {separator.join(self.syllogism_keyword[1])} {self.subject}'
             )
 

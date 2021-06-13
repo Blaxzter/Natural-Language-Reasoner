@@ -456,17 +456,19 @@
                 else if (type === 4) color = "#8a538a"
                 else if (type === 5) color = "#b39986"
                 else if (type === 6) color = "#188fec"
+                else if (type === 7) color = "#5797d6"
                 return color
             },
             get_border_color(type) {
-                let color = "#A4262C"
-                if (type === 0) color = "#CA5010"
-                else if (type === 1) color = "#CA5010"
-                else if (type === 2) color = "#407855"
-                else if (type === 3) color = "#40587C"
-                else if (type === 4) color = "#854085"
-                else if (type === 5) color = "#867365"
-                else if (type === 6) color = "#0078d4"
+                let color = "#8a1f25"
+                if (type === 0) color = "#a2491e"
+                else if (type === 1) color = "#a74713"
+                else if (type === 2) color = "#2b563a"
+                else if (type === 3) color = "#2e3d53"
+                else if (type === 4) color = "#5a305a"
+                else if (type === 5) color = "#7c5f49"
+                else if (type === 6) color = "#025fa9"
+                else if (type === 7) color = "#3471ab"
                 return color
             },
             recursive_sentence_structure(sentence_part) {
@@ -476,9 +478,9 @@
                 let ret_html = "<div " +
                     "class=\"p-2 m-2 rounded align-middle\" " +
                     "style=\"background-color: " + this.get_color(c_type) +
-                    "; border: 2px solid " + this.get_border_color(c_type) + "\">\n"
-                ret_html += "<h3 class='flex-row m-2'>" + sentence_part['name'] + "</h3>"
-                ret_html += "<div class='flex-row d-inline-flex m-2'>"
+                    "; border: 3px solid " + this.get_border_color(c_type) + "\">\n"
+                ret_html += "<h4 class='flex-row' style='margin: 0.25em 0.25em 0 0.25em'>" + sentence_part['name'] + "</h4>"
+                ret_html += "<div class='flex-row d-inline-flex'>"
                 if (sentence_part['tokens'])
                     ret_html += "<span>" + sentence_part['tokens'] + "</span>"
                 for (let i = 0; i < sentence_part['list'].length; i++) {

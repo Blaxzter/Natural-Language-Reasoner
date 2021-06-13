@@ -38,6 +38,7 @@ class ConnectedExpression(Expression):
             self.right_expression = args[2]
             self.connection_keyword = args[3]
             self.tokens = tokenize(
+                f'{de_morgen_expression if self.negated else ""}'
                 f'{self.left_expression.get_string_rep()} {self.connection_keyword} {self.right_expression.get_string_rep()}'
             )
 

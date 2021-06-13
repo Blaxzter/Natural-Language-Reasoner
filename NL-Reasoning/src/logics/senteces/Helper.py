@@ -72,19 +72,32 @@ def create_expression_representation(expression, ret_list = None):
         ret_list['type'] = 2
         ret_list['name'] = "Conditional Expression"
         ret_list["list"].append(dict(
-            type = 4,
+            type = 6,
             name = expression.when_keyword
         ))
         ret_list["list"].append(create_expression_representation(expression.when_expression, dict()))
         ret_list["list"].append(dict(
-            type = 4,
+            type = 6,
             name = expression.when_split_token
         ))
         ret_list["list"].append(create_expression_representation(expression.not_when_expression, dict()))
         return ret_list
-
-    elif type(expression) == BaseExpression:
+    elif type(expression) == QuantifiedExpression:
         ret_list['type'] = 3
+        ret_list['name'] = "For all Expression" if expression.for_all else "It Exists Expression"
+        ret_list["list"].append(dict(
+            type = 7,
+            name = separator.join(expression.quantified_sentence),
+        ))
+        ret_list["list"].append(dict(
+            type = 7,
+            name = "Variable",
+            tokens = expression.quantified_variable
+        ))
+        ret_list["list"].append(create_expression_representation(expression.quantified_expression, dict()))
+        return ret_list
+    elif type(expression) == BaseExpression:
+        ret_list['type'] = 4
         ret_list['name'] = "Basis Information"
         ret_list['tokens'] = separator.join(expression.tokens)
         return ret_list
