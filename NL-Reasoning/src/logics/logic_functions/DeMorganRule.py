@@ -1,9 +1,9 @@
 from collections import defaultdict
-
+from logics.logic_functions.Rule import Rule
 from logics.senteces.ConnectedExpression import ConnectedExpression
 
 
-class DeMorganRule:
+class DeMorganRule(Rule):
 
     def __init__(self):
         self.name = 'De Morgan Law Rule'

@@ -1,9 +1,9 @@
 from collections import defaultdict
-
+from logics.logic_functions.Rule import Rule
 from logics.senteces.ConnectedExpression import ConnectedExpression
 
 
-class OrRule:
+class OrRule(Rule):
 
     def __init__(self):
         self.name = 'Or Rule'

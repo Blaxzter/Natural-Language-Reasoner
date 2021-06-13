@@ -1,9 +1,10 @@
 from collections import defaultdict
 
+from logics.logic_functions.Rule import Rule
 from logics.senteces.ConnectedExpression import ConnectedExpression
 
 
-class AndRule:
+class AndRule(Rule):
 
     def __init__(self):
         self.name = 'And Rule'
