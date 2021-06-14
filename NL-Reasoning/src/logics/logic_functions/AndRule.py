@@ -9,7 +9,7 @@ class AndRule(Rule):
     def __init__(self, expression, resulting_expression_1, resulting_expression_2):
         self.name = 'And Rule'
         self.applicable = 'And Rule'
-        self.description = 'When the sentence connects to expressions with and.'
+        self.description = '(A AND B) => add to its leaf the chain of two nodes containing both arguments A, B'
         self.expression = expression
         self.resulting_expression_1 = resulting_expression_1
         self.resulting_expression_2 = resulting_expression_2

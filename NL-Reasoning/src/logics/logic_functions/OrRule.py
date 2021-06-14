@@ -8,7 +8,7 @@ class OrRule(Rule):
     def __init__(self, expression, resulting_expression_1, resulting_expression_2):
         self.name = 'Or Rule'
         self.applicable = 'Or Rule'
-        self.description = 'When the sentence connects to expressions with or.'
+        self.description = '(A OR B) => Create two sibling children to the leaf of the branch, containing formulae A and B, respectively'
         self.expression = expression
         self.resulting_expression_1 = resulting_expression_1
         self.resulting_expression_2 = resulting_expression_2

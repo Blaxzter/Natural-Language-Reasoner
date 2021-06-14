@@ -7,14 +7,28 @@ from logics.senteces.SyllogismExpression import SyllogismExpression
 
 class SyllogismRule(Rule):
 
-    def __init__(self, which_rule):
+    def __init__(self, which_rule, expression, resulting_expression_1):
         self.name = 'Syllogism Rule'
         self.applicable = 'Syllogism Rule'
         if which_rule == 1:
-            self.basic_description = None
+            self.description = 'None'
+        if which_rule == 2:
+            self.description = 'None'
+        if which_rule == 3:
+            self.description = 'None'
+        if which_rule == 4:
+            self.description = 'Reverse Conclusion'
+        self.resulting_expression_1 = resulting_expression_1
+        self.expression = expression
 
     def get_explanation(self, applied_rule):
-        return f'html rule'
+        return dict(
+            name=self.name,
+            description=self.description,
+            in_expression=[self.expression.get_string_rep()],
+            out_expression=[
+                [self.resulting_expression_1.get_string_rep()]],
+        )
 
     @staticmethod
     def apply_rule1(clause: SyllogismExpression, *args):
@@ -40,7 +54,7 @@ class SyllogismRule(Rule):
                                                                clause.subject, )
             new_clauses[0] = [created_syllogism_expression]
             break
-        return new_clauses, SyllogismRule(1)
+        return new_clauses, SyllogismRule(1, clause, created_syllogism_expression)
 
     @staticmethod
     def apply_rule2(clause: SyllogismExpression, *args):
@@ -70,7 +84,7 @@ class SyllogismRule(Rule):
             create_new_object(clause.subject, args[1]),
             clause.subject
         )]
-        return new_clauses, None
+        return new_clauses, SyllogismRule(2, clause, new_clauses[0])
 
     @staticmethod
     def apply_rule3(clause: SyllogismExpression, *args):
@@ -101,7 +115,7 @@ class SyllogismRule(Rule):
                 clause.subject,
             )]
             break
-        return new_clauses, None
+        return new_clauses, SyllogismRule(3, clause, new_clauses[0])
 
     @staticmethod
     def apply_reverse(clause: SyllogismExpression, *args):
@@ -144,4 +158,4 @@ class SyllogismRule(Rule):
                 clause.object,
                 clause.subject,
             )]
-        return new_clauses, None
+        return new_clauses, SyllogismRule(4, clause, new_clauses[0])
