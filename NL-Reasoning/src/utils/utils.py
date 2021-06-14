@@ -1,3 +1,16 @@
+import inflect
+
+
+def single_tokens(sentence_tokens):
+    single = inflect.engine()
+    single_tokens = []
+    for i, token in enumerate(sentence_tokens):
+        token_single = single.singular_noun(token)
+        if token_single != False and token != 'is' and token != 'chess':
+            single_tokens.append(token_single)
+        else:
+            single_tokens.append(token)
+    return single_tokens
 
 
 def tokenize(sentence: str):

@@ -12,13 +12,13 @@ class SyllogismRule(Rule):
         self.name = 'Syllogism Rule'
         self.applicable = 'Syllogism Rule'
         if which_rule == 1:
-            self.description = 'None'
+            self.description = 'All x is A => attach object x to argument A for all cases'
         if which_rule == 2:
-            self.description = 'None'
+            self.description = 'Some x is A => introduce new object x for argument A'
         if which_rule == 3:
             self.description = 'None'
         if which_rule == 4:
-            self.description = 'Reverse Conclusion'
+            self.description = 'Reverse Conclusion for proof check'
         self.resulting_expression_1 = resulting_expression_1
         self.expression = expression
 
