@@ -37,6 +37,7 @@ def tokenize(sentence: str):
                 ret_tokens.append(')')
         else:
             ret_tokens.append(token)
+    ret_tokens = single_tokens(ret_tokens)
     return ret_tokens
 
 
