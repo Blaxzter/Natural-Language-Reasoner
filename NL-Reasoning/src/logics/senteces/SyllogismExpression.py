@@ -86,7 +86,7 @@ class SyllogismExpression(Expression):
         return self.object == clause.object and self.subject == clause.subject
 
     def get_string_rep(self):
-        return f'{"it is not the case that " if self.negated else ""}{separator.join(self.tokens)}'
+        return f'{separator.join(self.tokens)}'
 
     def copy(self):
         return SyllogismExpression(

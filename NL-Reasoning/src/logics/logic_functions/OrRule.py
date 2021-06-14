@@ -19,8 +19,8 @@ class OrRule(Rule):
             description = self.description,
             basic_in_expression = ["Expression 1 OR Expression 2"],
             basic_out_expression = [["Expression 1"], ["Expression 1"]],
-            in_expression = [self.expression],
-            out_expression = [[self.resulting_expression_1], [self.resulting_expression_2]],
+            in_expression = [self.expression.get_string_rep()],
+            out_expression = [[self.resulting_expression_1.get_string_rep()], [self.resulting_expression_2.get_string_rep()]],
         )
 
     @staticmethod
