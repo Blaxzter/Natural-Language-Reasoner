@@ -3,7 +3,7 @@
     "tab_name": "Normal Examples",
     "examples": [
       {
-        "name": "standard",
+        "name": "Standard",
         "expressions": [
           {
             "value": "John plays football or chess"
@@ -16,6 +16,18 @@
           }
         ],
         "to_be_shown": "John plays not football"
+      },
+      {
+        "name": "Negation",
+        "expressions": [
+          {
+            "value": "When neither I love him or you love him then he becomes sad"
+          },
+          {
+            "value": "I not love him and you not love him"
+          }
+        ],
+        "to_be_shown": "He becomes sad"
       }
     ]
   },
@@ -23,7 +35,7 @@
     "tab_name": "Syllogism",
     "examples": [
       {
-        "name": "Philospher Examaple",
+        "name": "All-All",
         "expressions": [
           {
             "value": "all persons are mortal"
@@ -35,27 +47,10 @@
         "to_be_shown": "all philosophers are mortal"
       },
       {
-        "name": "Greeks are Mortal",
+        "name": "No-All",
         "expressions": [
           {
-            "value": "All humans are mortal"
-          },
-          {
-            "value": "All Greeks are human"
-          }
-        ],
-        "to_be_shown": "Therefore, all greeks are mortal"
-      }
-    ]
-  },
-  {
-    "tab_name": "My cool new tab",
-    "examples": [
-      {
-        "name": "My first example",
-        "expressions": [
-          {
-            "value": "no humans are birds"
+            "value": "No humans are birds"
           },
           {
             "value": "Sam is a human"
@@ -64,16 +59,28 @@
         "to_be_shown": "Sam is not a bird"
       },
       {
-        "name": " 2 ",
+        "name": "Some-All",
         "expressions": [
           {
-            "value": "all persons are mortal"
+            "value": "Some doctors are funny"
           },
           {
-            "value": "all philosophers are Frederics"
+            "value": "All doctors are humans"
           }
         ],
-        "to_be_shown": "all philosophers are mortal"
+        "to_be_shown": "Some humans are funny"
+      },
+      {
+        "name": "Some not-All",
+        "expressions": [
+          {
+            "value": "Some snakes are not poisonous"
+          },
+          {
+            "value": "All snakes are reptiles"
+          }
+        ],
+        "to_be_shown": "Some reptiles are not poisonous"
       }
     ]
   }
