@@ -235,32 +235,32 @@
                 <div class="card-body">
                     <table class="m-2">
                         <tr style="border-bottom: 2px solid black">
-                            <td v-for="in_expression in basic_in_expressions">
-                                {{in_expression}}
+                            <td v-for="(in_expression, index) in basic_in_expressions" class="align-middle">
+                                {{in_expression}}<span v-if="basic_in_expressions.length > 1 && index != basic_in_expressions.length - 1">,</span>
                             </td>
                         </tr>
                         <tr>
-                            <td v-for="out_expression in basic_out_expressions">
-                            <span v-for="out_inner_expression in out_expression">
-                                {{out_inner_expression}},
-                            </span>
-                                <span v-if="out_expressions.length > 1">|</span>
+                            <td v-for="(out_expression, index) in basic_out_expressions" class="align-middle">
+                                <span v-for="(out_inner_expression, index_2) in out_expression">
+                                    {{out_inner_expression}}<span v-if="out_expression.length > 1 && index_2 != out_expression.length - 1">,</span>
+                                </span>
+                                <span v-if="basic_out_expressions.length > 1 && index != basic_out_expressions.length - 1">|</span>
                             </td>
                         </tr>
                     </table>
                     <p>This rule applied looks like this:</p>
                     <table class="m-2">
                         <tr style="border-bottom: 2px solid black">
-                            <td v-for="in_expression in in_expressions">
-                                {{in_expression}}
+                            <td v-for="(in_expression, index) in in_expressions" class="align-middle">
+                                {{in_expression}}<span v-if="in_expressions.length > 1 && index != in_expressions.length - 1">,</span>
                             </td>
                         </tr>
                         <tr>
-                            <td v-for="out_expression in out_expressions">
-                            <span v-for="out_inner_expression in out_expression">
-                                {{out_inner_expression}},
-                            </span>
-                                <span v-if="out_expressions.length > 1">|</span>
+                            <td v-for="(out_expression, index) in out_expressions" class="align-middle">
+                                <span v-for="(out_inner_expression, index_2) in out_expression">
+                                    {{out_inner_expression}}<span v-if="out_expression.length > 1 && index_2 != out_expression.length - 1">,</span>
+                                </span>
+                                <span v-if="out_expressions.length > 1 && index != out_expressions.length - 1">|</span>
                             </td>
                         </tr>
                     </table>
@@ -293,7 +293,7 @@
             basic_in_expressions: "",
             basic_out_expressions: "",
             tooltip_description: "",
-            tooltip_visible: false,
+            tooltip_visible: true,
             topOffset: "0px",
             leftOffset: "0px",
         },
