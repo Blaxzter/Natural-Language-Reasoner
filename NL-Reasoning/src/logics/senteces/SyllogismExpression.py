@@ -73,6 +73,18 @@ class SyllogismExpression(Expression):
             self.subject
         )
 
+    def is_tautologie_of(self, clause):
+        if not self.is_individual or not clause.is_individual:
+            return False
+
+        if 'not' in self.individual_keyword and 'not' in clause.individual_keyword:
+            return False
+
+        if 'not' not in self.individual_keyword and 'not' not in clause.individual_keyword:
+            return False
+
+        return self.object == clause.object and self.subject == clause.subject
+
     def get_string_rep(self):
         return f'{"it is not the case that " if self.negated else ""}{separator.join(self.tokens)}'
 

@@ -1,4 +1,5 @@
 from collections import defaultdict
+from typing import List
 
 from logics.Util import create_new_object
 from logics.logic_functions.Rule import Rule
@@ -27,7 +28,9 @@ class SyllogismRule(Rule):
             description=self.description,
             in_expression=[self.expression.get_string_rep()],
             out_expression=[
-                [self.resulting_expression_1.get_string_rep()]],
+                [self.resulting_expression_1.get_string_rep()]
+                if type(self.resulting_expression_1) != list else
+                [expression.get_string_rep() for expression in self.resulting_expression_1]],
         )
 
     @staticmethod
@@ -40,6 +43,7 @@ class SyllogismRule(Rule):
             return new_clauses, None
 
         # Go over each class and search for a matching syllogism expression
+        created_syllogism_expression = None
         for comp_clause in args[0]:
             if type(comp_clause) is not SyllogismExpression:
                 continue
@@ -70,18 +74,19 @@ class SyllogismRule(Rule):
         if 'not' in clause.syllogism_keyword[1]:
             second_individual_keyword.insert(1, 'not')
 
+        new_object = create_new_object("object", args[1])
         new_clauses[0] += [SyllogismExpression(
             False,
             True,
             first_individual_keyword,
-            create_new_object(clause.object, args[1]),
+            new_object,
             clause.object
         )]
         new_clauses[0] += [SyllogismExpression(
             False,
             True,
             second_individual_keyword,
-            create_new_object(clause.subject, args[1]),
+            new_object,
             clause.subject
         )]
         return new_clauses, SyllogismRule(2, clause, new_clauses[0])

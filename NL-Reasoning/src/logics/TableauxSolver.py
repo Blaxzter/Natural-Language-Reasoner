@@ -3,6 +3,7 @@ from typing import List
 from logics.senteces.Expression import Expression
 from logics.LogicFunctions import rule_set
 from logics.senteces.BaseExpression import BaseExpression
+from logics.senteces.SyllogismExpression import SyllogismExpression
 from visualization.AppliedRule import AppliedRule
 from visualization.TreeGenerator import TreeGenerator
 
@@ -33,7 +34,7 @@ class TableauxSolver:
     @staticmethod
     def check_for_tautology(hypothesis: BaseExpression, clauses: List[Expression]):
         for clause in clauses:
-            if clause == hypothesis or type(clause) != BaseExpression:
+            if clause == hypothesis or not (type(clause) == BaseExpression or type(clause) == SyllogismExpression):
                 continue
 
             if hypothesis.is_tautologie_of(clause):
@@ -43,7 +44,7 @@ class TableauxSolver:
     def recursive_proof(self, clauses, applied_rules, parent = None) -> bool:
         # Check if we have a tautology in this branch
         for i, curr_clause in enumerate(clauses):
-            if type(curr_clause) != BaseExpression:
+            if not (type(curr_clause) == BaseExpression or type(curr_clause) == SyllogismExpression):
                 continue
 
             res, matched_clause = TableauxSolver.check_for_tautology(curr_clause, clauses)
