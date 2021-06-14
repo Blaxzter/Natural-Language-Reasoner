@@ -24,10 +24,12 @@ class SyllogismRule(Rule):
 
     def get_explanation(self, applied_rule):
         return dict(
-            name=self.name,
-            description=self.description,
-            in_expression=[self.expression.get_string_rep()],
-            out_expression=[
+            name = self.name,
+            description = self.description,
+            in_expression = [self.expression.get_string_rep()]
+            if type(self.expression) != list else
+            [expression.get_string_rep() for expression in self.expression],
+            out_expression = [
                 [self.resulting_expression_1.get_string_rep()]
                 if type(self.resulting_expression_1) != list else
                 [expression.get_string_rep() for expression in self.resulting_expression_1]],
@@ -101,6 +103,7 @@ class SyllogismRule(Rule):
             return new_clauses, None
 
         # Go over each class and search for a matching syllogism expression
+        used_comp_clause = None
         for comp_clause in args[0]:
             if type(comp_clause) is not SyllogismExpression:
                 continue
@@ -110,17 +113,19 @@ class SyllogismRule(Rule):
             if clause.object != comp_clause.subject:
                 continue
 
+            used_comp_clause = comp_clause
             individual_keyword = comp_clause.individual_keyword
             individual_keyword.insert(1, 'not')
             new_clauses[0] = [SyllogismExpression(
                 False,
                 True,
                 individual_keyword,
-                comp_clause.subject,
+                comp_clause.object,
                 clause.subject,
             )]
             break
-        return new_clauses, SyllogismRule(3, clause, new_clauses[0]) if len(new_clauses) != 0 else None
+        return new_clauses, SyllogismRule(3, [clause, used_comp_clause],
+                                          new_clauses[0]) if used_comp_clause is not None else None
 
     @staticmethod
     def apply_reverse(clause: SyllogismExpression, *args):
