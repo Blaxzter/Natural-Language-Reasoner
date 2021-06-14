@@ -6,7 +6,7 @@ def single_tokens(sentence_tokens):
     single_tokens = []
     for i, token in enumerate(sentence_tokens):
         token_single = single.singular_noun(token)
-        if token_single != False and token != 'is' and token != 'chess':
+        if token_single != False and token != 'is' and token != 'chess' and token != 'poisonous':
             single_tokens.append(token_single)
         else:
             single_tokens.append(token)
