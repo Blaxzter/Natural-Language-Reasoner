@@ -120,7 +120,7 @@ class SyllogismRule(Rule):
                 clause.subject,
             )]
             break
-        return new_clauses, SyllogismRule(3, clause, new_clauses[0])
+        return new_clauses, SyllogismRule(3, clause, new_clauses[0]) if len(new_clauses) != 0 else None
 
     @staticmethod
     def apply_reverse(clause: SyllogismExpression, *args):
