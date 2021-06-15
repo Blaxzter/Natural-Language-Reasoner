@@ -1,6 +1,6 @@
 [
   {
-    "tab_name": "Normal Examples",
+    "tab_name": "Standard Example",
     "examples": [
       {
         "name": "Standard",
@@ -16,6 +16,23 @@
           }
         ],
         "to_be_shown": "John plays not football"
+      }
+    ]
+  },
+  {
+    "tab_name": "More Examples",
+    "examples": [
+      {
+        "name": "Simple",
+        "expressions": [
+          {
+            "value": "When I play football or you play cricket then the field is used"
+          },
+          {
+            "value": "I play football"
+          }
+        ],
+        "to_be_shown": "The field is used"
       },
       {
         "name": "Negation",
@@ -28,6 +45,18 @@
           }
         ],
         "to_be_shown": "He becomes sad"
+      },
+      {
+        "name": "Double Negation",
+        "expressions": [
+          {
+            "value": "When neither I not visit him or you not visit him then he becomes happy"
+          },
+          {
+            "value": "I visit him and you visit him"
+          }
+        ],
+        "to_be_shown": "He becomes happy"
       }
     ]
   },
@@ -53,10 +82,10 @@
             "value": "No humans are birds"
           },
           {
-            "value": "Sam is a human"
+            "value": "All kids are humans"
           }
         ],
-        "to_be_shown": "Sam is not a bird"
+        "to_be_shown": "No kids are birds"
       },
       {
         "name": "Some-All",
