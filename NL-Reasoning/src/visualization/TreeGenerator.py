@@ -15,7 +15,7 @@ class TreeGenerator:
         new_nodes = []
 
         if applied_rule.created_expressions is None:
-            new_node = pydot.Node(self.node_id, id=f"node_{rule_id}", label = f'{self.get_rule_string([applied_rule.c_expression, applied_rule.matched_expression], applied_rule.rule_name, applied_rule.referenced_line)}', shape = 'polygon', tooltip=" ")
+            new_node = pydot.Node(self.node_id, id=f"node_{rule_id}", label = f'{self.get_rule_string([applied_rule.c_expression, applied_rule.matched_expression], applied_rule.rule_desc_obj["name"], applied_rule.referenced_line)}', shape = 'polygon', tooltip=" ")
             self.graph.add_node(new_node)
             my_edge = pydot.Edge(parent_node.get_name(), str(self.node_id))
             self.graph.add_edge(my_edge)
@@ -23,7 +23,7 @@ class TreeGenerator:
             new_nodes.append(new_node)
         else:
             for new_exp in applied_rule.created_expressions.values():
-                new_node = pydot.Node(self.node_id, id=f"node_{rule_id}", label = f'{self.get_rule_string(new_exp, applied_rule.rule_name, applied_rule.referenced_line)}', shape = 'polygon', tooltip=" ")
+                new_node = pydot.Node(self.node_id, id=f"node_{rule_id}", label = f'{self.get_rule_string(new_exp, applied_rule.rule_desc_obj["name"], applied_rule.referenced_line)}', shape = 'polygon', tooltip=" ")
                 self.graph.add_node(new_node)
 
                 my_edge = pydot.Edge(parent_node.get_name(), str(self.node_id))
@@ -36,11 +36,11 @@ class TreeGenerator:
 
         sorted_exp = sorted(expression, key = lambda expr: expr.id)
 
-        reference_line_str = f'<td ROWSPAN="{len(expression)}" SIDES="L">{reference_line}</td>' if reference_line is not None or rule_name == 'tautologie' else ""
+        reference_line_str = f'<td ROWSPAN="{len(expression)}" SIDES="L">{reference_line}</td>' if reference_line is not None or rule_name == 'Tautologie' else ""
 
         tautologie_line = ""
         table_head = f'<tr><td COLSPAN="3" ALIGN="CENTER" SIDES="B">{rule_name}</td></tr>'
-        if rule_name == 'tautologie':
+        if rule_name == 'Tautologie':
             tautologie_line = f'<tr><td COLSPAN="3" ALIGN="CENTER" SIDES="T">X</td></tr>'
             table_head = ''
 

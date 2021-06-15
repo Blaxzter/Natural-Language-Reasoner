@@ -13,9 +13,21 @@ class TableauxSolver:
     def __init__(self, hypothesis, thesis):
         self.hypothesis: List[Expression] = hypothesis
         self.thesis: Expression = thesis
-        self.applied_rules = {}
+        self.applied_rules = {
+            'root_node': AppliedRule(
+                rule_name = "Root Node",
+                referenced_line = 0,
+                c_expression = None,
+                rule_desc_obj = dict(
+                    name = "Reverse the premise",
+                    description = "In the root node we list all the given sentences. <br> "
+                                  "And have the sentence that is to be shown reversed.",
+                )
+            )
+        }
         self.list_of_new_objects = []
         self.solve_tree = None
+        self.all_branches_closed = True
 
     def proof(self):
         try:
@@ -51,11 +63,18 @@ class TableauxSolver:
             if res:
                 # Found Tautology with the matched clause
                 applied_rule = AppliedRule(
-                    rule_name = "tautologie",
+                    rule_name = "Tautologie",
                     referenced_line = curr_clause.id,
                     c_expression = curr_clause,
                     matched_expression = matched_clause,
-                    rule_desc_obj = dict(name="Tautologie")
+                    rule_desc_obj = dict(
+                        name = "Tautologie",
+                        description = "This means we have found an expression that shows the opposite.",
+                        basic_in_expression = ["¬A ∧ A"],
+                        basic_out_expression = ["X"],
+                        in_expression = [curr_clause.get_string_rep(), matched_clause.get_string_rep()],
+                        out_expression = [["X"]],
+                    )
                 )
                 self.solve_tree.add_node(parent, applied_rule, len(self.applied_rules))
                 self.applied_rules[f"node_{len(self.applied_rules)}"] = applied_rule
@@ -80,8 +99,8 @@ class TableauxSolver:
 
                 if len(branches) != 0:
                     applied_rule.created_expressions = branches
-                    if created_rule:
-                        applied_rule.rule_desc_obj = created_rule.get_explanation(applied_rule)
+                    rule_explanation = created_rule.get_explanation(applied_rule)
+                    applied_rule.rule_desc_obj = rule_explanation
                     applied_rules.append(applied_rule)
                     new_nodes = self.solve_tree.add_node(parent, applied_rule, len(self.applied_rules))
                     self.applied_rules[f"node_{len(self.applied_rules)}"] = applied_rule
@@ -108,4 +127,5 @@ class TableauxSolver:
                 return closes
 
         # Tested every rule and didn't find anything applicable to close the branch
+        self.all_branches_closed = False
         return False

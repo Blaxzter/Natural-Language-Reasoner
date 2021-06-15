@@ -20,5 +20,8 @@ class NaturalTableauxSolver:
     def get_applied_rules(self):
         return self.solver.applied_rules
 
+    def tableaux_is_closed(self):
+        return self.solver.all_branches_closed
+
     def get_dot_graph(self):
         return self.solver.solve_tree.create_file()

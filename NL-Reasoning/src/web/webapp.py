@@ -51,7 +51,6 @@ def get_language_request(request: Request):
 
 
 def get_solve_request(request: Request):
-    print(request.body)
     request = json.loads(request.body.decode("utf-8"))
     expressions = [data['value'] for data in request['expressions']]
     to_be_shown = request['to_be_shown']
@@ -62,6 +61,7 @@ def get_solve_request(request: Request):
 
         response = json.dumps(dict(
             applied_rules = {i: applied_rule.get_dict() for i, applied_rule in nts.get_applied_rules().items()},
+            all_branches_closed = nts.tableaux_is_closed(),
             dot_graph = nts.get_dot_graph())
         )
         return Response(response)
