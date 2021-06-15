@@ -8,7 +8,7 @@ class WhenRule(Rule):
     def __init__(self, expression, resulting_expression_1, resulting_expression_2):
         self.name = 'When Rule'
         self.applicable = 'When Rule'
-        self.description = '(When A then B) = (If A then B) = (Not A OR B) => Create two sibling leaf to the branch containing Not A, B, respectively'
+        self.description = '(When A then B) = (If A then B) = (Not A OR B) => <br> Create two sibling leaf to the branch containing Not A, B, respectively'
         self.expression = expression
         self.resulting_expression_1 = resulting_expression_1
         self.resulting_expression_2 = resulting_expression_2

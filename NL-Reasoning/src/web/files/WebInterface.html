@@ -139,7 +139,14 @@
                                 style="margin-top: 8px;">Solve
                         </button>
                     </fieldset>
-                    <div class="card applied_rules" v-if="applied_rules.length != 0">
+
+                    <div v-if="response" class="card my-4"
+                         :class="{'bg-success': tree_closes, 'bg-danger': !tree_closes}">
+                        <h2 v-if="tree_closes" class="display-5 text-center">The statement is valid.</h2>
+                        <h2 v-if="!tree_closes" class="display-5 text-center">There is a branch that doesn't close.</h2>
+                    </div>
+
+                    <div class="card applied_rules my-4" v-if="applied_rules.length != 0">
                         <div class="card-header">
                             <h3 class="mb-0 d-inline align-middle">Applied Rules</h3>
                             <button class="btn btn-default float-right align-middle"
@@ -153,7 +160,7 @@
                         </div>
                         <div id="accordion" class="accordion collapse">
                             <div class="accordion-item" v-for="(rule, index) in applied_rules">
-                                <div class="accordion-header" v-bind:id="'heading_' + index">
+                                <div class="accordion-header" v-bind:id="'heading_' + index" v-if="index != 'root_node'">
 
                                     <button class="accordion-button" type="button" data-bs-toggle="collapse"
                                             v-bind:data-bs-target="'#collapse-' + index">
@@ -199,7 +206,7 @@
                             </div>
                         </div>
                     </div>
-                    <div id="graph" class="graph border-end border-start"></div>
+                    <div id="graph" class="graph" :class="{border: response}"></div>
                 </div>
                 <div class="tab-pane" id="language" role="tabpanel" aria-labelledby="language-tab">
                     <h3>Language Check</h3>
@@ -226,45 +233,68 @@
                 </div>
             </div>
 
-            <div style="color: red">{{error}}</div>
+            <div class="card bg-danger" v-if="error">
+                <div class="card-header">
+                    <span class="lead">
+                        Internal Error
+                    </span>
+                </div>
+                <div class="card-body">
+                    <span class="lead">Oops something went wrong and we dont really know what.</span><br>
+                    <span class="lead">This could help tho: {{error.body}}</span>
+                </div>
+            </div>
 
+            <div v-if="response" style="height: calc(0.5 * 100vh)"></div>
             <div id="tooltip" class="card"
                  :style="{'display': tooltip_visible ? 'block' : 'none', 'top': topOffset, 'left': leftOffset}"
                  style="position: fixed">
                 <div class="card-header">{{tooltip_header}}</div>
                 <div class="card-body">
-                    <table class="m-2">
+                    <table class="m-2" v-if="basic_in_expressions">
                         <tr style="border-bottom: 2px solid black">
-                            <td v-for="(in_expression, index) in basic_in_expressions" class="align-middle">
-                                {{in_expression}}<span v-if="basic_in_expressions.length > 1 && index != basic_in_expressions.length - 1">,</span>
+                            <td style="text-align: center;">
+                                <span v-for="(in_expression, index) in basic_in_expressions">
+                                    {{in_expression}}
+                                    <span v-if="basic_in_expressions.length > 1 && index != basic_in_expressions.length - 1">,</span>
+                                </span>
                             </td>
                         </tr>
                         <tr>
-                            <td v-for="(out_expression, index) in basic_out_expressions" class="align-middle">
-                                <span v-for="(out_inner_expression, index_2) in out_expression">
-                                    {{out_inner_expression}}<span v-if="out_expression.length > 1 && index_2 != out_expression.length - 1">,</span>
+                            <td style="text-align: center;">
+                                <span v-for="(out_expression, index) in basic_out_expressions">
+                                    <span v-for="(out_inner_expression, index_2) in out_expression">
+                                        {{out_inner_expression}}<span
+                                            v-if="out_expression.length > 1 && index_2 != out_expression.length - 1">,</span>
+                                    </span>
+                                    <span v-if="basic_out_expressions.length > 1 && index != basic_out_expressions.length - 1">|</span>
                                 </span>
-                                <span v-if="basic_out_expressions.length > 1 && index != basic_out_expressions.length - 1">|</span>
                             </td>
                         </tr>
                     </table>
-                    <p>This rule applied looks like this:</p>
-                    <table class="m-2">
+                    <p v-if="basic_in_expressions">This rule applied looks like this:</p>
+                    <table class="m-2" v-if="in_expressions">
                         <tr style="border-bottom: 2px solid black">
-                            <td v-for="(in_expression, index) in in_expressions" class="align-middle">
-                                {{in_expression}}<span v-if="in_expressions.length > 1 && index != in_expressions.length - 1">,</span>
+                            <td style="text-align: center;">
+                                <span v-for="(in_expression, index) in in_expressions">
+                                    {{in_expression}}
+                                    <span v-if="in_expressions.length > 1 && index != in_expressions.length - 1">,</span>
+                                </span>
                             </td>
                         </tr>
                         <tr>
-                            <td v-for="(out_expression, index) in out_expressions" class="align-middle">
-                                <span v-for="(out_inner_expression, index_2) in out_expression">
-                                    {{out_inner_expression}}<span v-if="out_expression.length > 1 && index_2 != out_expression.length - 1">,</span>
+                            <td style="text-align: center;">
+                                <span v-for="(out_expression, index) in out_expressions">
+                                    <span v-for="(out_inner_expression, index_2) in out_expression">
+                                        {{out_inner_expression}}
+                                        <span v-if="out_expression.length > 1 && index_2 != out_expression.length - 1">,</span>
+                                    </span>
+                                    <span v-if="out_expressions.length > 1 && index != out_expressions.length - 1">|</span>
                                 </span>
-                                <span v-if="out_expressions.length > 1 && index != out_expressions.length - 1">|</span>
                             </td>
                         </tr>
                     </table>
-                    <p class="m-2">{{tooltip_description}}</p>
+                    <p class="m-2" v-html="tooltip_description"></p>
                 </div>
             </div>
         </main>
@@ -279,9 +309,10 @@
         data: {
             expressions: [],
             to_be_shown: null,
-            response: '',
-            error: '',
+            response: null,
+            error: null,
             applied_rules: [],
+            tree_closes: true,
             up: true,
             current_tab: 'Normal Examples',
             tabs: [],
@@ -304,10 +335,12 @@
                 this.change_page("language")
 
             window.onmousemove = (e) => {
-                var x = e.clientX,
-                    y = e.clientY;
-                this.topOffset = (y + 20) + 'px';
-                this.leftOffset = (x + 20) + 'px';
+                if (this.tooltip_visible) {
+                    let x = e.clientX,
+                        y = e.clientY;
+                    this.topOffset = (y + 20) + 'px';
+                    this.leftOffset = (x + 20) + 'px';
+                }
             };
 
             axios
@@ -389,11 +422,13 @@
                 let data = {expressions: this.expressions, to_be_shown: this.to_be_shown};
                 this.$http.post('/solve-request', data).then(response => {
 
+                    console.log(data)
+
                     // get body data
                     this.response = response.body;
                     this.applied_rules = response.body['applied_rules']
+                    this.tree_closes = JSON.parse(response.body['all_branches_closed'])
 
-                    console.log("hey")
                     for (let applied_rule_idx in this.applied_rules) {
                         applied_rule = this.applied_rules[applied_rule_idx]
                         if (applied_rule.created_expressions) {
@@ -409,12 +444,6 @@
                 });
             },
             toggle_tooltip(element, enter) {
-
-                if (element[0].id === "root_node") {
-                    this.tooltip_visible = false
-                    return
-                }
-
                 c_rule = this.applied_rules[element[0].id]['rule_desc_obj']
                 rule_object = JSON.parse(c_rule.replaceAll("'", '"'))
 
@@ -472,7 +501,6 @@
                 return color
             },
             recursive_sentence_structure(sentence_part) {
-
                 c_type = sentence_part['type']
 
                 let ret_html = "<div " +
