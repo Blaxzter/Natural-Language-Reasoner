@@ -980,7 +980,7 @@
   {
     "premise_1": "Some birds have two legs",
     "premise_2": "Some animals are birds",
-    ",conclusion": "Some animals not have two legs",
+    "conclusion": "Some animals not have two legs",
     "valid": "invalid"
   },
   {
@@ -1202,25 +1202,25 @@
   {
     "premise_1": "Some snakes are not venomous",
     "premise_2": "All snakes are reptiles",
-    "conclusion": "All snakes are not venomous",
+    "conclusion": "All reptiles are not venomous",
     "valid": "invalid"
   },
   {
     "premise_1": "Some snakes are not venomous",
     "premise_2": "All snakes are reptiles",
-    "conclusion": "No snakes are not venomous",
+    "conclusion": "No reptiles are not venomous",
     "valid": "invalid"
   },
   {
     "premise_1": "Some snakes are not venomous",
     "premise_2": "All snakes are reptiles",
-    "conclusion": "Some snakes are not venomous",
+    "conclusion": "Some reptiles are not venomous",
     "valid": "invalid"
   },
   {
     "premise_1": "Some snakes are not venomous",
     "premise_2": "All snakes are reptiles",
-    "conclusion": "Some snakes are (not not) venomous",
+    "conclusion": "Some reptiles are not venomous",
     "valid": "valid"
   },
   {
