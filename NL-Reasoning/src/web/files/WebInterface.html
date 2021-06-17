@@ -227,7 +227,7 @@
 
                     <div class="container-fluid d-flex flex-row p-4 align-content-center">
 
-                        <div v-html="create_sentence_presentation">
+                        <div v-html="create_sentence_presentation" style="position: absolute; left: 50%; transform: translateX(-50%);">
                         </div>
                     </div>
                 </div>
@@ -481,23 +481,31 @@
                 if (type === 0) color = "#c66432"
                 else if (type === 1) color = "#ca5e26"
                 else if (type === 2) color = "#4f7e5f"
+                else if (type === -2) color = "#6dc88a"
                 else if (type === 3) color = "#586983"
-                else if (type === 4) color = "#8a538a"
+                else if (type === -3) color = "#8aa1cb"
+                else if (type === 4) color = "#b161b1"
+                else if (type === -4) color = "#ffb8ff"
                 else if (type === 5) color = "#b39986"
-                else if (type === 6) color = "#188fec"
-                else if (type === 7) color = "#5797d6"
+                else if (type === -5) color = "#fdb78a"
+                else if (type === 6) color = "#1281d6"
+                else if (type === -6) color = "#68a8ec"
                 return color
             },
             get_border_color(type) {
                 let color = "#8a1f25"
-                if (type === 0) color = "#a2491e"
-                else if (type === 1) color = "#a74713"
-                else if (type === 2) color = "#2b563a"
-                else if (type === 3) color = "#2e3d53"
-                else if (type === 4) color = "#5a305a"
-                else if (type === 5) color = "#7c5f49"
-                else if (type === 6) color = "#025fa9"
-                else if (type === 7) color = "#3471ab"
+                if (type === 0) color = "#d24e00"
+                else if (type === 1) color = "#ca5e26"
+                else if (type === 2) color = "#285f42"
+                else if (type === -2) color = "#2f854a"
+                else if (type === 3) color = "#354d77"
+                else if (type === -3) color = "#40567e"
+                else if (type === 4) color = "#452245"
+                else if (type === -4) color = "#8f488f"
+                else if (type === 5) color = "#836550"
+                else if (type === -5) color = "#9d6640"
+                else if (type === 6) color = "#064673"
+                else if (type === -6) color = "#284877"
                 return color
             },
             recursive_sentence_structure(sentence_part) {
@@ -510,7 +518,7 @@
                 ret_html += "<h4 class='flex-row' style='margin: 0.25em 0.25em 0 0.25em'>" + sentence_part['name'] + "</h4>"
                 ret_html += "<div class='flex-row d-inline-flex'>"
                 if (sentence_part['tokens'])
-                    ret_html += "<span>" + sentence_part['tokens'] + "</span>"
+                    ret_html += "<span class=\"text-center text-nowrap\"><strong>" + sentence_part['tokens'] + "</strong></span>"
                 for (let i = 0; i < sentence_part['list'].length; i++) {
                     let current_sentence_part = sentence_part['list'][i]
                     if (current_sentence_part['list'] && current_sentence_part['list'].length >= 1) {
@@ -522,11 +530,12 @@
                             "; display: flex; justify-content: center; flex-direction: column; " +
                             "border: 2px solid " + this.get_border_color(cs_type) + "\">\n"
                         if (cs_type === -1)
-                            ret_html += "<span>¬</span>"
+                            ret_html += "<span class=\"text-center\">¬</span>"
                         else
-                            ret_html += "<span>" + current_sentence_part['name'] + "</span>"
+                            if (current_sentence_part['name'])
+                                ret_html += "<span class=\"text-center text-nowrap\">" + current_sentence_part['name'] + "</span>"
                         if (current_sentence_part['tokens'])
-                            ret_html += "<span>" + current_sentence_part['tokens'] + "</span>"
+                            ret_html += "<span class=\"text-center text-nowrap\"><strong>" + current_sentence_part['tokens'] + "</strong></span>"
                         ret_html += "</div>"
                     }
                 }

@@ -112,5 +112,22 @@
         "to_be_shown": "Some reptiles are not poisonous"
       }
     ]
+  },
+  {
+    "tab_name": "Quantified",
+    "examples": [
+      {
+        "name": "Multi Function",
+        "expressions": [
+          {
+            "value": "for all x, for all y, if x is a parent of y, then x is older than y"
+          },
+          {
+            "value": "for all x, for all y, if x is the mother of y, then x is a parent of y"
+          }
+        ],
+        "to_be_shown": "Lulu is the mother of Fifi"
+      }
+    ]
   }
 ]

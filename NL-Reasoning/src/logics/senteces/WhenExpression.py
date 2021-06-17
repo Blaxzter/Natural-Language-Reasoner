@@ -1,6 +1,9 @@
-from logics.Constants import separator, when_keywords, when_split_tokens
+import re
+
+from logics.Constants import separator, when_keywords, when_split_tokens, when_left_regex, when_right_regex
 from logics.senteces.Expression import Expression
-from utils.utils import tokenize
+from logics.senteces.ParseException import ParseException
+from utils.Utils import tokenize, get_sentences_key_words
 
 
 class WhenExpression(Expression):
@@ -9,70 +12,77 @@ class WhenExpression(Expression):
         if len(args) == 1:
             super().__init__(args[0])
 
-            self.when_keyword = None
-            self.when_split_token = None
-            split_index = -1
-            # Go over each when token
-            for when_token in when_keywords:
+            test_sentence = self.get_string_rep()
 
-                # When the when token is in the sentence search for split token
-                if when_token in self.tokens:
+            self.left_match = None
+            self.key_words = None
 
-                    # Go over the split tokens
-                    for when_split_token in when_split_tokens:
-                        if when_split_token in self.tokens:
-                            self.when_split_token = when_split_token
-                            # get split index
-                            split_index = self.tokens.index(when_split_token)
-                            self.when_keyword = when_token
-                            break
+            reg_match = None
+            for test_reg, is_left in [(when_left_regex, True), (when_right_regex, False)]:
+                reg_match = re.match(test_reg, test_sentence, re.IGNORECASE)
+                if reg_match:
+                    self.left_match = is_left
                     break
 
-            if split_index == -1:
-                raise Exception("No split token found: when expression require then or , keyword")
+            if reg_match is None:
+                raise ParseException(f"No regex match found for the when expression: \n"
+                                     f"Original sentence: {test_sentence}")
 
-            left_tokens = list(self.tokens[:split_index])
-            right_tokens = list(self.tokens[split_index + 1:])
+            # Go over each group and get the sentences between the keywords
+            sentences, self.key_words = get_sentences_key_words(reg_match, test_sentence)
+
+            if len(sentences) != 2:
+                raise ParseException(f"The when expression doesn't have two sentences"
+                                     f"Original sentence: {test_sentence}")
 
             # Get the when expression that needs to be negated if necessary
-            if self.when_keyword in left_tokens:
-                when_token = left_tokens
-                not_when_token = right_tokens
-            else:
-                when_token = right_tokens
-                not_when_token = left_tokens
-
-            when_token.remove(self.when_keyword)
-
             from logics.senteces.Helper import create_expression
-            self.when_expression = create_expression(separator.join(when_token))
-            self.not_when_expression = create_expression(separator.join(not_when_token))
+            if self.left_match:
+                self.when_expression = create_expression(sentences[0])
+                self.not_when_expression = create_expression(sentences[1])
+            else:
+                self.when_expression = create_expression(sentences[1])
+                self.not_when_expression = create_expression(sentences[0])
+
         else:
             self.count_id()
             self.negated = args[0]
             self.when_expression = args[1]
             self.not_when_expression = args[2]
-            self.when_keyword = args[3]
-            self.when_split_token = args[4]
+            self.left_match = args[3]
+            self.key_words = args[4]
+            self.tokenize_expression()
 
-            self.tokens = tokenize(
-                f'{"it is not the case that " if self.negated else ""}{self.when_keyword}'
-                f'{self.when_expression.get_string_rep()} {self.when_split_token} {self.not_when_expression.get_string_rep()}'
-            )
+    def tokenize_expression(self):
+        sentence = f'{"it is not the case that " if self.negated else ""}'
+        sentence += \
+            f'{self.key_words[0]} {self.when_expression.get_string_rep()} {self.key_words[1]} {self.not_when_expression.get_string_rep()}' \
+                if self.left_match else \
+                f'{self.not_when_expression.get_string_rep()} {self.key_words[0]} {self.when_expression.get_string_rep()}'
+
+        self.tokens = tokenize(sentence)
+
+    def replace_variable(self, replace, replace_with):
+        new_when_expression = self.copy()
+        new_when_expression.when_expression = new_when_expression.when_expression.replace_variable(replace, replace_with)
+        new_when_expression.not_when_expression = new_when_expression.not_when_expression.replace_variable(replace, replace_with)
+        new_when_expression.tokenize_expression()
+        return new_when_expression
 
     def reverse_expression(self):
         return WhenExpression(
             not self.negated,
             self.when_expression,
             self.not_when_expression,
-            self.when_keyword,
-            self.when_split_token
+            self.left_match,
+            self.key_words
         )
 
     def copy(self):
         return WhenExpression(
             self.negated,
             self.when_expression,
-            self.not_when_token,
-            self.when_keyword
+            self.not_when_expression,
+            self.left_match,
+            self.key_words
         )

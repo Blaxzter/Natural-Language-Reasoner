@@ -1,9 +1,11 @@
 from collections import defaultdict
-from typing import List
 
-from logics.Util import create_new_object
+from logics.Constants import pos_function_keywords, neg_function_keywords, separator, pos_middle_keywords, \
+    neg_middle_keywords, get_opposite_of
 from logics.logic_functions.Rule import Rule
+from logics.senteces.FunctionExpression import FunctionExpression
 from logics.senteces.SyllogismExpression import SyllogismExpression
+from utils.Utils import create_new_object, tokenize, list_in_check, list_eq_check
 
 
 class SyllogismRule(Rule):
@@ -38,90 +40,103 @@ class SyllogismRule(Rule):
     @staticmethod
     def apply_rule1(clause: SyllogismExpression, *args):
         new_clauses = defaultdict(list)
-        if type(clause) is not SyllogismExpression:
+        if clause.negated or type(clause) is not SyllogismExpression:
             return new_clauses, None
 
-        if clause.syllogism_keyword is None or clause.syllogism_keyword[0] != 'all':
+        if clause.syllogism_keywords is None or clause.syllogism_keywords[0] != 'all':
             return new_clauses, None
 
         # Go over each class and search for a matching syllogism expression
         created_syllogism_expression = None
+        used_comp_clause = None
         for comp_clause in args[0]:
-            if type(comp_clause) is not SyllogismExpression:
+            if type(comp_clause) is not FunctionExpression:
                 continue
-            if not comp_clause.is_individual:
-                continue
-
-            if clause.object != comp_clause.subject:
+            if comp_clause.multi:
                 continue
 
-            created_syllogism_expression = SyllogismExpression(False, True, comp_clause.individual_keyword,
-                                                               comp_clause.object,
-                                                               clause.subject, )
+            if clause.object != comp_clause.quantified_function:
+                continue
+
+            if list_in_check(neg_function_keywords, comp_clause.key_words):
+                continue
+
+            used_comp_clause = comp_clause
+            created_syllogism_expression = FunctionExpression(
+                False,
+                comp_clause.variables,
+                clause.subject,
+                comp_clause.key_words,
+                False
+            )
             new_clauses[0] = [created_syllogism_expression]
             break
-        return new_clauses, SyllogismRule(1, clause, created_syllogism_expression)
+        return new_clauses, SyllogismRule(1, [clause, used_comp_clause], created_syllogism_expression)
 
     @staticmethod
     def apply_rule2(clause: SyllogismExpression, *args):
         new_clauses = defaultdict(list)
-        if type(clause) is not SyllogismExpression:
+        if clause.negated or type(clause) is not SyllogismExpression:
             return new_clauses, None
 
-        if clause.syllogism_keyword is None or clause.syllogism_keyword[0] != 'some':
+        if clause.syllogism_keywords is None or clause.syllogism_keywords[0] != 'some':
             return new_clauses, None
 
-        first_individual_keyword = ['is', 'a']
-        second_individual_keyword = ['is', 'a']
-        if 'not' in clause.syllogism_keyword[1]:
-            second_individual_keyword.insert(1, 'not')
+        first_individual_keyword = ['is a']
+        second_individual_keyword = ['is a']
+        if 'not' in clause.syllogism_keywords[1]:
+            second_individual_keyword = ['is not a']
 
-        new_object = create_new_object("object", args[1])
-        new_clauses[0] += [SyllogismExpression(
+        new_object = create_new_object(args[1])
+        new_clauses[0] += [FunctionExpression(
             False,
-            True,
+            [new_object],
+            clause.object,
             first_individual_keyword,
-            new_object,
-            clause.object
+            False
         )]
-        new_clauses[0] += [SyllogismExpression(
+        new_clauses[0] += [FunctionExpression(
             False,
-            True,
+            [new_object],
+            clause.subject,
             second_individual_keyword,
-            new_object,
-            clause.subject
+            False
         )]
         return new_clauses, SyllogismRule(2, clause, new_clauses[0])
 
     @staticmethod
     def apply_rule3(clause: SyllogismExpression, *args):
         new_clauses = defaultdict(list)
-        if type(clause) is not SyllogismExpression:
+        if clause.negated or type(clause) is not SyllogismExpression:
             return new_clauses, None
 
-        if clause.syllogism_keyword is None or clause.syllogism_keyword[0] != 'no':
+        if clause.syllogism_keywords is None or clause.syllogism_keywords[0] != 'no':
             return new_clauses, None
 
         # Go over each class and search for a matching syllogism expression
         used_comp_clause = None
         for comp_clause in args[0]:
-            if type(comp_clause) is not SyllogismExpression:
+            if type(comp_clause) is not FunctionExpression:
                 continue
-            if not comp_clause.is_individual:
+            if comp_clause.multi:
                 continue
 
-            if clause.object != comp_clause.subject:
+            if clause.object != comp_clause.quantified_function:
+                continue
+
+            if list_in_check(neg_function_keywords, comp_clause.key_words):
                 continue
 
             used_comp_clause = comp_clause
-            individual_keyword = comp_clause.individual_keyword
-            individual_keyword.insert(1, 'not')
-            new_clauses[0] = [SyllogismExpression(
+            new_keyword = comp_clause.key_words[0].split(separator)
+            new_keyword.insert(1, 'not')
+
+            new_clauses[0] = [FunctionExpression(
                 False,
-                True,
-                individual_keyword,
-                comp_clause.object,
+                comp_clause.variables,
                 clause.subject,
+                [separator.join(new_keyword)],
+                False
             )]
             break
         return new_clauses, SyllogismRule(3, [clause, used_comp_clause],
@@ -136,35 +151,34 @@ class SyllogismRule(Rule):
         if not clause.negated:
             return new_clauses, None
 
-        if clause.syllogism_keyword is None or clause.syllogism_keyword[0] == 'all':
+        pos_list_check = list_eq_check(pos_middle_keywords, clause.syllogism_keywords[1])
+        neg_list_check = list_eq_check(neg_middle_keywords, clause.syllogism_keywords[1])
+        if clause.syllogism_keywords[0] == 'all' and pos_list_check:
             new_clauses[0] += [SyllogismExpression(
                 False,
-                False,
-                ("some", ['are', 'not']),
+                ["some", get_opposite_of(pos_list_check)],
                 clause.object,
                 clause.subject,
             )]
-        elif clause.syllogism_keyword is None or clause.syllogism_keyword[0] == 'some':
+        elif clause.syllogism_keywords[0] == 'some' and pos_list_check:
+            middle_word = "has" if pos_list_check == "have" else "is"
             new_clauses[0] += [SyllogismExpression(
                 False,
-                False,
-                ("no", ['is']),
+                ["no", middle_word],
                 clause.object,
                 clause.subject,
             )]
-        elif clause.syllogism_keyword is None or clause.syllogism_keyword[0] == 'no':
+        elif clause.syllogism_keywords[0] == 'no' and pos_list_check:
             new_clauses[0] += [SyllogismExpression(
                 False,
-                False,
-                ("some", ['are']),
+                ["some", 'are'],
                 clause.object,
                 clause.subject,
             )]
-        elif clause.syllogism_keyword is None or clause.syllogism_keyword[0] == 'no':
+        elif clause.syllogism_keywords[0] == 'some' and neg_list_check:
             new_clauses[0] += [SyllogismExpression(
                 False,
-                False,
-                ("all", ['are']),
+                ["all", 'are'],
                 clause.object,
                 clause.subject,
             )]

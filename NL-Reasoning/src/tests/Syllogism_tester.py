@@ -1,6 +1,8 @@
 import json
 import pandas as pd
 
+from logics.senteces.Helper import create_expression
+from logics.senteces.SyllogismExpression import SyllogismExpression
 from src.logics.NaturalTableauxSolver import NaturalTableauxSolver
 
 if __name__ == '__main__':
@@ -14,11 +16,21 @@ if __name__ == '__main__':
                        data[i]["premise_2"]]
         to_be_shown = data[i]["conclusion"]
         nts = NaturalTableauxSolver(expressions, to_be_shown)
+
+        for parsed_expression, original_expression in zip(nts.expressions + [nts.to_be_shown], [data[i]["premise_1"], data[i]["premise_2"], data[i]["conclusion"]]):
+            if type(parsed_expression) != SyllogismExpression:
+                create_expression(original_expression)
+                print(f'Wrong expression parsed: {parsed_expression}')
+
         nts.solve()
         ans = nts.tableaux_is_closed()
+
+        is_valid = 'invalid' in data[i]["valid"]
+        if ans == is_valid:
+            print(ans, data[i]["valid"], expressions, to_be_shown)
         result.append(ans)
 
-    df['result'] = result
-    df.to_csv('output_final.csv', index=False)
+    # df['result'] = result
+    # df.to_csv('output_final.csv', index=False)
 
 

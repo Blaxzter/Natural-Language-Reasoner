@@ -15,6 +15,6 @@ services:
     networks:
       - nginx-net
     environment:
-      VIRTUAL_HOST: nl-reasoner.fabraham.dev,fabraham.dev
-      LETSENCRYPT_HOST: nl-reasoner.fabraham.dev,fabraham.dev
+      VIRTUAL_HOST: nl-reasoner.fabraham.dev
+      LETSENCRYPT_HOST: nl-reasoner.fabraham.dev
       LETSENCRYPT_EMAIL: mail@fabraham.dev

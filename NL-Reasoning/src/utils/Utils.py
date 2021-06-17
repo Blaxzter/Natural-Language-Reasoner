@@ -1,6 +1,41 @@
 import inflect
 
 
+def create_new_object(list_of_new_objects, ref_object = None):
+
+    if len(list_of_new_objects) == 0 and ref_object is None:
+        list_of_new_objects.append("There")
+        return "There"
+
+    for i in range(1, 10000):
+        new_object = f'{ref_object if ref_object is not None else "Object"}_{i}'
+        if new_object not in list_of_new_objects:
+            list_of_new_objects.append(new_object)
+            return new_object
+    raise Exception("We dont have any new objects left... sorry.")
+
+
+def get_sentences_key_words(reg_match, sentence):
+    # Filter unnecessary group matches
+    reg_groups = list(filter(
+        lambda x: not ((x[0] == 0 and x[1] == len(sentence)) or (x[0] == -1 and x[1] == -1)),
+        reg_match.regs
+    ))
+
+    sentences = []
+    key_words = []
+    c_index = 0
+    for group_match in reg_groups:
+        l_idx, r_idx = group_match
+        curr_sentence = sentence[l_idx:r_idx].strip()
+        key_words.append(curr_sentence)
+        if l_idx - c_index > 0:
+            sentences.append(sentence[c_index:l_idx].strip())
+        c_index = r_idx + (1 if len(curr_sentence) != 0 else 0)
+    sentences.append(sentence[c_index:])
+    return sentences, key_words
+
+
 def single_tokens(sentence_tokens):
     single = inflect.engine()
     single_tokens = []
@@ -13,6 +48,20 @@ def single_tokens(sentence_tokens):
     return single_tokens
 
 
+def list_eq_check(element_list, comp_str):
+    for element in element_list:
+        if element == comp_str:
+            return element
+    return None
+
+
+def list_in_check(element_list, comp_list):
+    for element in element_list:
+        if element in comp_list:
+            return element
+    return None
+
+
 def tokenize(sentence: str):
     tokens = sentence.split(" ")
     ret_tokens = []
@@ -20,7 +69,8 @@ def tokenize(sentence: str):
         if ',' in token or '!' in token or ')' in token or '(' in token:
             if ',' in token:
                 c_token = token.split(',')
-                ret_tokens.append(c_token[0])
+                if len(c_token[0]) != 0:
+                    ret_tokens.append(c_token[0])
                 ret_tokens.append(',')
             if '!(' in token:
                 c_token = token.split('!(')

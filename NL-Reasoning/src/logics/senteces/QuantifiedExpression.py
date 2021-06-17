@@ -1,6 +1,10 @@
-from logics.Constants import separator, quantified_keywords_plural, quantified_keywords_singular
+import re
+
+from logics.Constants import separator, quantified_keywords_plural, quantified_keywords_singular, \
+    quantified_regex_plural, quantified_regex_singular
 from logics.senteces.Expression import Expression
-from utils.utils import tokenize
+from logics.senteces.ParseException import ParseException
+from utils.Utils import tokenize, get_sentences_key_words
 
 
 class QuantifiedExpression(Expression):
@@ -10,57 +14,78 @@ class QuantifiedExpression(Expression):
             super().__init__(args[0])
 
             self.for_all = True
-            self.quantified_sentence = None
+            self.quantification_sentence = None
             self.quantified_variable = None
             self.quantified_expression = None
 
-            for quantified_keyword_singular in quantified_keywords_singular:
-                if quantified_keyword_singular in self.init_hypo:
-                    self.for_all = False
-                    self.quantified_sentence = tokenize(quantified_keyword_singular)
+            test_sentence = self.get_string_rep()
+
+            reg_match = None
+            for test_reg, for_all in [(quantified_regex_plural, True), (quantified_regex_singular, False)]:
+                reg_match = re.match(test_reg, test_sentence, re.IGNORECASE)
+                if reg_match:
+                    self.for_all = for_all
                     break
 
-            if self.quantified_sentence is None:
-                for quantified_keyword_plural in quantified_keywords_plural:
-                    if quantified_keyword_plural in self.init_hypo:
-                        self.quantified_sentence = tokenize(quantified_keyword_plural)
-                        break
+            if reg_match is None:
+                raise ParseException(f"No regex match found for the quantified expression: \n"
+                                     f"Original sentence: {test_sentence}")
 
-            quantified_token_length = len(self.quantified_sentence)
-            self.quantified_variable = self.tokens[quantified_token_length]
+            # Go over each group and get the sentences between the keywords
+            sentences, key_words = get_sentences_key_words(reg_match, test_sentence)
+
+            self.quantification_sentence = key_words[0]
+            self.quantification_split = key_words[1]
+
+            self.quantified_variable = sentences[0]
+
             from logics.senteces.Helper import create_expression
-            self.quantified_expression = create_expression(separator.join(self.tokens[quantified_token_length + 1:]))
-
+            self.quantified_expression = create_expression(sentences[1])
         else:
             self.count_id()
 
-            self.for_all = args[0]
-            self.quantified_sentence = args[1]
-            self.quantified_variable = args[2]
-            self.quantified_expression = args[3]
+            self.negated = args[0]
+            self.for_all = args[1]
+            self.quantification_sentence = args[2]
+            self.quantification_split = args[3]
+            self.quantified_variable = args[4]
+            self.quantified_expression = args[5]
 
-            self.tokens = tokenize(
-                f'{"it is not the case that " if self.negated else ""}'
-                f'{self.quantified_sentence} {self.quantified_variable} {self.quantified_expression}'
-            )
+        self.tokenize_expression()
+
+    def tokenize_expression(self):
+        self.tokens = tokenize(
+            f'{"it is not the case that " if self.negated else ""}'
+            f'{self.quantification_sentence} {self.quantified_variable} {self.quantification_split} {self.quantified_expression.get_string_rep()}'
+        )
+
+    def replace_variable(self, replace, replace_with):
+        new_quantified_expression = self.copy()
+        if new_quantified_expression.quantified_variable == replace:
+            new_quantified_expression.quantified_variable = replace_with
+        new_quantified_expression.quantified_expression = new_quantified_expression.quantified_expression.replace_variable(replace, replace_with)
+        new_quantified_expression.tokenize_expression()
+        return new_quantified_expression
 
     def reverse_expression(self):
         return QuantifiedExpression(
             not self.negated,
             self.for_all,
-            self.quantified_sentence,
+            self.quantification_sentence,
+            self.quantification_split,
             self.quantified_variable,
             self.quantified_expression
         )
 
     def get_string_rep(self):
-        return f'{"it is not the case that " if self.negated else ""}{separator.join(self.tokens)}'
+        return f'{separator.join(self.tokens)}'
 
     def copy(self):
         return QuantifiedExpression(
             self.negated,
             self.for_all,
-            self.quantified_sentence,
+            self.quantification_sentence,
+            self.quantification_split,
             self.quantified_variable,
             self.quantified_expression
         )

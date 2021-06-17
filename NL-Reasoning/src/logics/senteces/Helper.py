@@ -1,45 +1,43 @@
 from logics.Constants import *
 from logics.senteces.BaseExpression import BaseExpression
 from logics.senteces.ConnectedExpression import ConnectedExpression
+from logics.senteces.FunctionExpression import FunctionExpression
+from logics.senteces.ParseException import ParseException
 from logics.senteces.QuantifiedExpression import QuantifiedExpression
 from logics.senteces.SyllogismExpression import SyllogismExpression
 from logics.senteces.WhenExpression import WhenExpression
 
 import re
 
-def create_expression(hypothesis):
-    lower = hypothesis.lower()
+creating_structures = [
+    (QuantifiedExpression, quantified_regex),
+    (FunctionExpression, function_regex),
+    (SyllogismExpression, syllogism_regex_complete),
+    (WhenExpression, when_regex),
+    (ConnectedExpression, connected_regex),
+]
 
-    creating_structures = [
-        (quantified_keywords, QuantifiedExpression, None),
-        (syllogism_keywords, SyllogismExpression, syllogism_regex),
-        (when_keywords, WhenExpression, None),
-        (connection_keywords, ConnectedExpression, None),
-    ]
+def create_expression(hypothesis):
+    lower = hypothesis.strip().lower()
 
     error_list = []
 
-    for creating_structure in creating_structures:
-        if check_if_in(creating_structure[0], lower):
-            if creating_structure[2] is not None:
-                if re.match(creating_structure[2], lower, re.IGNORECASE):
-                    try:
-                        expression = creating_structure[1](lower)
-                        return expression
-                    except Exception as err:
-                        error_list.append(err)
-            else:
-                try:
-                    expression = creating_structure[1](lower)
-                    return expression
-                except Exception as err:
-                    error_list.append(err)
+    # We go over each element in the creating structure and check for the regular expression
+    # We only want full matches
+    for constructor, expression_regex in creating_structures:
+        regex_match = re.match(expression_regex, lower, re.IGNORECASE)
+        if regex_match and regex_match.end() == len(lower):
+            try:
+                expression = constructor(lower)
+                return expression
+            except Exception as err:
+                error_list.append(err)
     try:
         expression = BaseExpression(lower)
         return expression
     except Exception as err:
         error_list.append(err)
-        return error_list
+        raise ParseException(error_list)
 
 
 def create_expression_representation(expression, ret_list = None):
@@ -50,56 +48,90 @@ def create_expression_representation(expression, ret_list = None):
     if expression.negated:
         ret_list["list"].append(dict(
             type = -1,
-            name = expression.negated
+            tokens = expression.negated
         ))
 
     if type(expression) == SyllogismExpression:
-        ret_list['type'] = 0
+        ret_list['type'] = 1
         ret_list['name'] = "Syllogism"
         ret_list['tokens'] = separator.join(expression.tokens)
         return ret_list
     elif type(expression) == ConnectedExpression:
-        ret_list['type'] = 1
+        ret_list['type'] = 2
         ret_list['name'] = "Connected Expression"
         ret_list["list"].append(create_expression_representation(expression.left_expression, dict()))
         ret_list["list"].append(dict(
-            type = 5,
-            name = expression.connection_keyword
+            type = -2,
+            tokens = expression.connection_keyword
         ))
         ret_list["list"].append(create_expression_representation(expression.right_expression, dict()))
         return ret_list
     elif type(expression) == WhenExpression:
-        ret_list['type'] = 2
-        ret_list['name'] = "Conditional Expression"
-        ret_list["list"].append(dict(
-            type = 6,
-            name = expression.when_keyword
-        ))
+        ret_list['type'] = 3
+        ret_list['name'] = f"{'Left' if expression.left_match else 'Right'} Conditional Expression"
+        if expression.left_match:
+            ret_list["list"].append(dict(
+                type = -3,
+                tokens = expression.key_words[0]
+            ))
         ret_list["list"].append(create_expression_representation(expression.when_expression, dict()))
         ret_list["list"].append(dict(
-            type = 6,
-            name = expression.when_split_token
+            type = -3,
+            tokens = expression.key_words[1 if expression.left_match else 0]
         ))
         ret_list["list"].append(create_expression_representation(expression.not_when_expression, dict()))
         return ret_list
+
     elif type(expression) == QuantifiedExpression:
-        ret_list['type'] = 3
+        ret_list['type'] = 4
         ret_list['name'] = "For all Expression" if expression.for_all else "It Exists Expression"
         ret_list["list"].append(dict(
-            type = 7,
-            name = separator.join(expression.quantified_sentence),
+            type = -4,
+            tokens = expression.quantification_sentence,
         ))
         ret_list["list"].append(dict(
-            type = 7,
+            type = -4,
             name = "Variable",
             tokens = expression.quantified_variable
+        ))
+        ret_list["list"].append(dict(
+            type = -4,
+            tokens = expression.quantification_split
         ))
         ret_list["list"].append(create_expression_representation(expression.quantified_expression, dict()))
         return ret_list
     elif type(expression) == BaseExpression:
-        ret_list['type'] = 4
+        ret_list['type'] = 5
         ret_list['name'] = "Basis Information"
         ret_list['tokens'] = separator.join(expression.tokens)
+        return ret_list
+    elif type(expression) == FunctionExpression:
+        ret_list['type'] = 6
+        ret_list['name'] = f"{'F' if not expression.multi else 'Multif'}unction Expression"
+        ret_list["list"].append(dict(
+            type = -6,
+            name = "Variable",
+            tokens = expression.variables[0]
+        ))
+        ret_list["list"].append(dict(
+            type = -6,
+            tokens = expression.key_words[0]
+        ))
+        ret_list["list"].append(dict(
+            type = -6,
+            name = "Function",
+            tokens = expression.quantified_function
+        ))
+        if expression.multi:
+            ret_list["list"].append(dict(
+                type = -6,
+                tokens = expression.key_words[1]
+            ))
+            ret_list["list"].append(dict(
+                type = -6,
+                name = "Variable",
+                tokens = expression.variables[1]
+            ))
         return ret_list
 
 

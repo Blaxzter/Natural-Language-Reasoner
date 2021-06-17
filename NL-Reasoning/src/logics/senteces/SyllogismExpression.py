@@ -1,6 +1,9 @@
-from logics.Constants import pluralism_keywords, separator, individuals_keywords
+import re
+
+from logics.Constants import pluralism_keywords, separator, syllogism_regex
 from logics.senteces.Expression import Expression
-from utils.utils import tokenize
+from logics.senteces.ParseException import ParseException
+from utils.Utils import tokenize, get_sentences_key_words
 
 
 class SyllogismExpression(Expression):
@@ -13,77 +16,52 @@ class SyllogismExpression(Expression):
             if self.tokens[0] == 'therefore':
                 self.tokens = self.tokens[2:]
 
-            self.is_individual = True
-            self.syllogism_keyword = None
+            self.syllogism_keywords = None
 
-            for pluralism_keyword in pluralism_keywords:
-                if pluralism_keyword in self.tokens:
-                    self.is_individual = False
-                    self.syllogism_keyword = (pluralism_keyword, self.tokens[2:-1])
-                    break
+            test_sentence = self.get_string_rep()
+            reg_match = re.match(syllogism_regex, test_sentence, re.IGNORECASE)
 
-            self.individual_keyword = None
-            if self.syllogism_keyword is None:
-                for individuals_keyword in individuals_keywords:
-                    if individuals_keyword in self.init_hypo:
-                        key_word_token = tokenize(individuals_keyword)
-                        self.individual_keyword = key_word_token
+            if reg_match is None:
+                raise ParseException(f"No regex match found for the when expression: \n"
+                                     f"Original sentence: {test_sentence}")
 
-            if self.individual_keyword is None and self.syllogism_keyword is None:
-                raise Exception("wrong keyword detected")
+            # Go over each group and get the sentences between the keywords
+            sentences, self.syllogism_keywords = get_sentences_key_words(reg_match, test_sentence)
 
             # Get the subject and object
-            self.object = self.tokens[0 if self.is_individual else 1]
-
-            if self.individual_keyword:
-                if len(self.tokens) > 1 + len(self.individual_keyword) + 1:
-                    raise Exception("Tokens are to long for syllogism")
-
-            self.subject = self.tokens[-1]
+            self.object = sentences[0]
+            self.subject = sentences[1]
         else:
             self.count_id()
             self.negated = args[0]
-            self.is_individual = args[1]
+            self.syllogism_keywords = args[1]
+            self.object = args[2]
+            self.subject = args[3]
 
-            self.syllogism_keyword = None
-            self.individual_keyword = None
+            self.tokenize_expression()
 
-            if self.is_individual:
-                self.individual_keyword = args[2]
-            else:
-                self.syllogism_keyword = args[2]
+    def tokenize_expression(self):
+        self.tokens = tokenize(
+            f'{"it is not the case that " if self.negated else ""}'
+            f'{self.syllogism_keywords[0]} {self.object} {self.syllogism_keywords[1]} {self.subject}'
+        )
 
-            self.object = args[3]
-            self.subject = args[4]
-
-            self.tokens = tokenize(
-                f'{"it is not the case that " if self.negated else ""}'
-                f'{self.object} {separator.join(self.individual_keyword)} {self.subject}'
-                if self.is_individual else
-                f'{"it is not the case that " if self.negated else ""}'
-                f'{self.syllogism_keyword[0]} {self.object} {separator.join(self.syllogism_keyword[1])} {self.subject}'
-            )
+    def replace_variable(self, replace, replace_with):
+        new_syllogism_exp = self.copy()
+        if new_syllogism_exp.object == replace:
+            new_syllogism_exp.object = replace_with
+        if new_syllogism_exp.subject == replace:
+            new_syllogism_exp.subject = replace_with
+        new_syllogism_exp.tokenize_expression()
+        return new_syllogism_exp
 
     def reverse_expression(self):
         return SyllogismExpression(
             not self.negated,
-            self.is_individual,
-            self.individual_keyword if self.is_individual else self.syllogism_keyword,
+            self.syllogism_keywords,
             self.object,
             self.subject
         )
-
-    def is_tautologie_of(self, clause):
-        if not self.is_individual or not clause.is_individual:
-            return False
-
-        if 'not' in self.individual_keyword and 'not' in clause.individual_keyword:
-            return False
-
-        if 'not' not in self.individual_keyword and 'not' not in clause.individual_keyword:
-            return False
-
-        return self.object == clause.object and self.subject == clause.subject
 
     def get_string_rep(self):
         return f'{separator.join(self.tokens)}'
@@ -91,8 +69,7 @@ class SyllogismExpression(Expression):
     def copy(self):
         return SyllogismExpression(
             self.negated,
-            self.is_individual,
-            self.individual_keyword if self.is_individual else self.syllogism_keyword,
+            self.syllogism_keywords,
             self.object,
             self.subject
         )

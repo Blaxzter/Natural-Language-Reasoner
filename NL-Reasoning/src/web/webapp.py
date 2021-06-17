@@ -44,7 +44,7 @@ def get_language_request(request: Request):
         response = json.dumps(representation)
         return Response(response)
     except Exception as err:
-        print(err)
+        traceback.print_exc()
         response = Response(str(err))
         response.status_int = 500
         return response

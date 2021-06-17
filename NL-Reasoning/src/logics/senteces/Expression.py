@@ -1,7 +1,7 @@
 from typing import List
 
 from logics.Constants import connection_keywords, complete_negation, separator
-from utils.utils import tokenize
+from utils.Utils import tokenize
 import abc
 
 
@@ -53,8 +53,15 @@ class Expression(metaclass=abc.ABCMeta):
 
                 self.tokens = left_tokens + [reference] + base_tokens + right_tokens
 
+    def is_tautologie_of(self, clause):
+        return False
+
     @abc.abstractmethod
     def reverse_expression(self):
+        pass
+
+    @abc.abstractmethod
+    def replace_variable(self, replace, replace_with):
         pass
 
     @abc.abstractmethod
@@ -71,7 +78,7 @@ class Expression(metaclass=abc.ABCMeta):
         return separator.join(self.tokens)
 
     def __str__(self):
-        return f'{self.negated} {self.tokens}'
+        return f'{type(self).__name__}(neg={self.negated}, tokens={self.tokens})'
 
     def __repr__(self):
         return f'{self.tokens}'

@@ -1,6 +1,7 @@
 from logics.Constants import negation_keywords
 from logics.senteces.Expression import Expression
-from utils.utils import tokenize
+from logics.senteces.ParseException import ParseException
+from utils.Utils import tokenize
 
 
 class BaseExpression(Expression):
@@ -22,6 +23,10 @@ class BaseExpression(Expression):
 
             if self.negated:
                 self.tokens.remove(self.negation_word)
+
+            if len(self.tokens) != 3:
+                raise ParseException("This base expression is not supported.")
+
             self.subject = self.tokens[0]
             self.verb = self.tokens[1]
             self.object = self.tokens[2]
@@ -33,9 +38,12 @@ class BaseExpression(Expression):
             self.verb = args[3]
             self.object = args[4]
 
-            self.tokens = tokenize(
-                f'{self.subject} {self.verb}{" " + self.negation_word + " " if self.negated else " "}{self.object}'
-            )
+            self.tokenize_expression()
+
+    def tokenize_expression(self):
+        self.tokens = tokenize(
+            f'{self.subject} {self.verb}{" " + self.negation_word + " " if self.negated else " "}{self.object}'
+        )
 
     def reverse_expression(self):
         """
@@ -49,6 +57,15 @@ class BaseExpression(Expression):
             self.verb,
             self.object
         )
+
+    def replace_variable(self, replace, replace_with):
+        new_base_expression = self.copy()
+        if new_base_expression.subject == replace:
+            new_base_expression.subject = replace_with
+        if new_base_expression.object == replace:
+            new_base_expression.object = replace_with
+        new_base_expression.tokenize_expression()
+        return new_base_expression
 
     def is_tautologie_of(self, clause):
 
