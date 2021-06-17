@@ -1,6 +1,6 @@
-from logics.Constants import negation_keywords
+from logics.Constants import negation_keywords, separator, base_filler_words
 from logics.senteces.Expression import Expression
-from logics.senteces.ParseException import ParseException
+from logics.senteces.ParseExceptions import ParseException
 from utils.Utils import tokenize
 
 
@@ -24,12 +24,30 @@ class BaseExpression(Expression):
             if self.negated:
                 self.tokens.remove(self.negation_word)
 
-            if len(self.tokens) != 3:
-                raise ParseException("This base expression is not supported.")
+            extra_allowed = 0
+            for token in self.tokens:
+                if token in base_filler_words:
+                    extra_allowed += 1
 
-            self.subject = self.tokens[0]
-            self.verb = self.tokens[1]
-            self.object = self.tokens[2]
+            if len(self.tokens) - extra_allowed != 3:
+                raise ParseException(f"This base expression is not supported: {self.init_hypo}")
+
+            start_index = 0
+            end_index = 1
+            fill_counter = 0
+            for token in self.tokens:
+                if token in base_filler_words:
+                    end_index += 1
+                else:
+                    if fill_counter == 0:
+                        self.subject = separator.join(self.tokens[start_index:end_index])
+                    elif fill_counter == 1:
+                        self.verb = separator.join(self.tokens[start_index:end_index])
+                    elif fill_counter == 2:
+                        self.object = separator.join(self.tokens[start_index:end_index])
+                    fill_counter += 1
+                    start_index = end_index
+                    end_index = start_index + 1
         else:
             self.count_id()
             self.negated = args[0]
@@ -67,17 +85,17 @@ class BaseExpression(Expression):
         new_base_expression.tokenize_expression()
         return new_base_expression
 
-    def is_tautologie_of(self, clause):
+    def is_tautologie_of(self, clause, list_of_new_objects):
 
         if type(clause) is not BaseExpression:
-            return False
+            return False, None
 
         if clause.negated == self.negated:
-            return False
+            return False, None
 
         return self.object == clause.object and \
             self.verb == clause.verb and \
-            self.subject == clause.subject
+            self.subject == clause.subject, None
 
     def get_string_rep(self):
         """

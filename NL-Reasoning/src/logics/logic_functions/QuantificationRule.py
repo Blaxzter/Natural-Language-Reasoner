@@ -2,8 +2,6 @@ from collections import defaultdict
 
 from logics.senteces.QuantifiedExpression import QuantifiedExpression
 from logics.senteces.UnifiableVariable import UnifiableVariable
-from logics.senteces.WhenExpression import WhenExpression
-from logics.senteces.ConnectedExpression import ConnectedExpression
 from logics.logic_functions.Rule import Rule
 from utils.Utils import create_new_object
 
@@ -25,8 +23,8 @@ class QuantificationRule(Rule):
         return dict(
             name=self.name,
             description=self.description,
-            basic_in_expression = ["¬ for all x. P(x)" if self.negation else "¬ it exists x. P(x)"],
-            basic_out_expression = [["for all x. ¬ P(x)" if not self.negation else "it exists x. ¬P(x)"]],
+            basic_in_expression = ["¬ for all x. P(x)" if self.negation else "any x"],
+            basic_out_expression = [["for all x. ¬ P(x)" if self.negation else "c"]],
             in_expression=[self.expression.get_string_rep()],
             out_expression=[[self.resulting_expression.get_string_rep()]
                 if type(self.resulting_expression) != list else
@@ -43,7 +41,7 @@ class QuantificationRule(Rule):
         this_clause.quantification_sentence = "it exists a" if this_clause.for_all else "for all"
         this_clause.for_all = not this_clause.for_all
         this_clause.quantified_expression = this_clause.quantified_expression.reverse_expression()
-        return this_clause, QuantificationRule(clause, new_clauses[0])
+        return this_clause, QuantificationRule(clause, new_clauses[0], negation = True)
 
     @staticmethod
     def apply_replace_rule(clause: QuantifiedExpression, *args):
@@ -59,4 +57,4 @@ class QuantificationRule(Rule):
 
         new_clause = clause.quantified_expression.replace_variable(clause.quantified_variable, replace_with)
         new_clauses[0] += [new_clause]
-        return new_clauses, QuantificationRule(clause, new_clauses[0])
+        return new_clauses, QuantificationRule(clause, new_clauses[0], negation = False)

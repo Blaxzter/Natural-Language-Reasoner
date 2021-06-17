@@ -1,6 +1,7 @@
 from typing import List
 
-from logics.Constants import connection_keywords, complete_negation, separator
+from logics.Constants import connection_keywords, complete_negation, separator, de_morgen_expression
+from logics.senteces.ParseExceptions import ParseException
 from utils.Utils import tokenize
 import abc
 
@@ -11,7 +12,7 @@ class Expression(metaclass=abc.ABCMeta):
     def __init__(self, hypothesis):
 
         if hypothesis is None or (type(hypothesis) is not str and type(hypothesis) is not list):
-            raise ValueError("A hypothesis needs to be of type string or token list and can't be empty.")
+            raise ParseException("A hypothesis needs to be of type string or token list and can't be empty.")
 
         self.count_id()
 
@@ -36,7 +37,6 @@ class Expression(metaclass=abc.ABCMeta):
     def split_references(self):
         """
         Splits the sentence that references previous subjects into multiple base tokens
-        TODO Should probably be rewritten to check if separated by semicolon
         :return:
         """
         for reference in connection_keywords:
@@ -48,12 +48,13 @@ class Expression(metaclass=abc.ABCMeta):
                 if len(right_tokens) != 1:
                     continue
 
-                base_tokens = self.tokens[:reference_idx - 1]
+                start_idx = 1 if self.tokens[0] == de_morgen_expression else 0
+                base_tokens = self.tokens[start_idx:reference_idx - 1]
                 left_tokens = self.tokens[:reference_idx]
 
                 self.tokens = left_tokens + [reference] + base_tokens + right_tokens
 
-    def is_tautologie_of(self, clause):
+    def is_tautologie_of(self, clause, list_of_new_objects):
         return False
 
     @abc.abstractmethod

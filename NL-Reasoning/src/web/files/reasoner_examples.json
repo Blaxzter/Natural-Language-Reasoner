@@ -117,6 +117,15 @@
     "tab_name": "Quantified",
     "examples": [
       {
+        "name": "Simple",
+        "expressions": [
+          {
+            "value": "for all frederics, frederics are cool"
+          }
+        ],
+        "to_be_shown": "Frederic is cool"
+      },
+      {
         "name": "Multi Function",
         "expressions": [
           {
@@ -124,9 +133,12 @@
           },
           {
             "value": "for all x, for all y, if x is the mother of y, then x is a parent of y"
+          },
+          {
+            "value": "Lulu is the mother of Fifi"
           }
         ],
-        "to_be_shown": "Lulu is the mother of Fifi"
+        "to_be_shown": "Lulu is older than Fifi"
       }
     ]
   }

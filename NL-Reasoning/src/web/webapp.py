@@ -9,6 +9,7 @@ from pyramid.response import Response, FileResponse
 
 from logics.NaturalTableauxSolver import NaturalTableauxSolver
 from logics.senteces.Helper import create_expression, create_expression_representation
+from logics.senteces.ParseExceptions import ParseException
 
 
 def get_main_page(request):
@@ -26,7 +27,7 @@ def get_file(request):
     print(request)
     here = os.path.dirname(os.path.abspath(__file__))
     response = FileResponse(
-        os.path.join(here, 'files/examples.json'),
+        os.path.join(here, f'files/{request.GET["name"]}'),
         request = request,
         content_type = 'application/json'
     )
@@ -45,7 +46,11 @@ def get_language_request(request: Request):
         return Response(response)
     except Exception as err:
         traceback.print_exc()
-        response = Response(str(err))
+        response = Response(str(dict(
+            type = type(err).__name__,
+            list = None if type(err) is not ParseException else err.exception_list,
+            error = str(err)
+        )))
         response.status_int = 500
         return response
 
@@ -67,7 +72,11 @@ def get_solve_request(request: Request):
         return Response(response)
     except Exception as err:
         traceback.print_exc()
-        response = Response(str(err))
+        response = Response(str(dict(
+            type = type(err).__name__,
+            list = None if type(err) is not ParseException else err.exception_list,
+            error = str(err)
+        )))
         response.status_int = 500
         return response
 

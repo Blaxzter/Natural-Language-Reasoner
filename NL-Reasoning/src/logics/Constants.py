@@ -33,10 +33,11 @@ base_regex = f"({complete_negation} )?"
 separator = ' '
 
 negation_keywords = ['not', 'never']
+base_filler_words = ['the', 'must']
 
 connection_keywords = ['or', 'and', ';', 'nor']
 
-demoregen_regex = "Neither [a-zA-Z0-9 -]+ (nor|and) [a-zA-Z0-9 -]+"
+demoregen_regex = "Neither [a-zA-Z0-9 -]+ (nor|and|or) [a-zA-Z0-9 -]+"
 true_connected_regex = "[a-zA-Z0-9 -]+ (or|and|;) [a-zA-Z0-9 -]+"
 connected_regex = f"{base_regex}({demoregen_regex}|{true_connected_regex})"
 
@@ -71,8 +72,18 @@ conclusion_regex = "(Therefore, )?"
 syllogism_regex_complete = f"{conclusion_regex}{base_regex}{syllogism_regex}"
 
 
-pos_function_keywords = ["is the", "is an", "is a", "is"]
-neg_function_keywords = ["is not the", "is not an", "is not a", "is not"]
+pos_function_keywords = ["is the", "is an", "is a", "is", "are"]
+neg_function_keywords = ["is not the", "is not an", "is not a", "is not", "are not"]
+
+def get_opposite_of_function(middle_keyword):
+    if middle_keyword in pos_function_keywords:
+        position = pos_function_keywords.index(middle_keyword)
+        return neg_function_keywords[position]
+
+    if middle_keyword in neg_function_keywords:
+        position = neg_function_keywords.index(middle_keyword)
+        return pos_function_keywords[position]
+
 function_keywords = pos_function_keywords + neg_function_keywords
 function_split_keywords = ["than", "of"]
 single_function_regex = f"[a-zA-Z0-9-]+ {or_reg(function_keywords)} [a-zA-Z0-9-]+"

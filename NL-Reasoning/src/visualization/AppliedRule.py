@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Dict
+from typing import Dict, List
 
 from logics.senteces.Expression import Expression
 
@@ -10,7 +10,7 @@ class AppliedRule:
     referenced_line: int = field()
     c_expression: Expression = field(default = None, compare = False, hash = False)
     matched_expression: Expression = field(default = None, compare = False, hash = False)
-    created_expressions: Dict[int, Expression] = field(default = None, compare = False, hash = False)
+    created_expressions: Dict[int, List[Expression]] = field(default = None, compare = False, hash = False)
     rule_desc_obj: Dict = field(default = None, compare = False, hash = False)
 
     def get_dict(self):

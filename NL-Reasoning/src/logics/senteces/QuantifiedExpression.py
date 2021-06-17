@@ -3,7 +3,7 @@ import re
 from logics.Constants import separator, quantified_keywords_plural, quantified_keywords_singular, \
     quantified_regex_plural, quantified_regex_singular
 from logics.senteces.Expression import Expression
-from logics.senteces.ParseException import ParseException
+from logics.senteces.ParseExceptions import ParseException
 from utils.Utils import tokenize, get_sentences_key_words
 
 

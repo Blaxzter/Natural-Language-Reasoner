@@ -1,11 +1,11 @@
 from collections import defaultdict
 
-from logics.Constants import pos_function_keywords, neg_function_keywords, separator, pos_middle_keywords, \
+from logics.Constants import neg_function_keywords, separator, pos_middle_keywords, \
     neg_middle_keywords, get_opposite_of
 from logics.logic_functions.Rule import Rule
 from logics.senteces.FunctionExpression import FunctionExpression
 from logics.senteces.SyllogismExpression import SyllogismExpression
-from utils.Utils import create_new_object, tokenize, list_in_check, list_eq_check
+from utils.Utils import create_new_object, list_in_check, list_eq_check
 
 
 class SyllogismRule(Rule):
@@ -96,7 +96,7 @@ class SyllogismRule(Rule):
             False
         )]
         new_clauses[0] += [FunctionExpression(
-            False,
+            'not' in clause.syllogism_keywords[1],
             [new_object],
             clause.subject,
             second_individual_keyword,
@@ -132,7 +132,7 @@ class SyllogismRule(Rule):
             new_keyword.insert(1, 'not')
 
             new_clauses[0] = [FunctionExpression(
-                False,
+                True,
                 comp_clause.variables,
                 clause.subject,
                 [separator.join(new_keyword)],

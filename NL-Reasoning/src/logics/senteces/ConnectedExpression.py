@@ -1,5 +1,6 @@
 from logics.Constants import connection_keywords, separator, de_morgen_expression
 from logics.senteces.Expression import Expression
+from logics.senteces.ParseExceptions import ParseException
 from utils.Utils import tokenize
 
 
@@ -30,7 +31,7 @@ class ConnectedExpression(Expression):
                     break
 
             if self.connection_keyword is None:
-                raise Exception("Connection keyword but no keyword? :thinking:")
+                raise ParseException("Connection keyword but no keyword? :thinking:")
         else:
             self.count_id()
             self.negated = args[0]

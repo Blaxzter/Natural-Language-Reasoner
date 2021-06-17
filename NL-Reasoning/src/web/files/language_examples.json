@@ -1,0 +1,26 @@
+[
+  {
+    "group_name": "Simple Examples",
+    "examples": [
+      "When i eat pizza, then you eat pizza"
+    ]
+  },
+  {
+    "group_name": "Singlefunction Examples",
+    "examples": [
+      "Charis are cool",
+      "Chairs are not cool",
+      "It is not the case that chairs are cool",
+      "It is not the case that chairs are not cool"
+    ]
+  },
+  {
+    "group_name": "Multifunction Examples",
+    "examples": [
+      "Peter is the father of Susi",
+      "Peter is not the father of Susi",
+      "It is not the case that Peter is the father of Susi",
+      "It is not the case that Peter is not the father of Susi"
+    ]
+  }
+]

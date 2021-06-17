@@ -2,7 +2,7 @@ from logics.Constants import *
 from logics.senteces.BaseExpression import BaseExpression
 from logics.senteces.ConnectedExpression import ConnectedExpression
 from logics.senteces.FunctionExpression import FunctionExpression
-from logics.senteces.ParseException import ParseException
+from logics.senteces.ParseExceptions import ParseException
 from logics.senteces.QuantifiedExpression import QuantifiedExpression
 from logics.senteces.SyllogismExpression import SyllogismExpression
 from logics.senteces.WhenExpression import WhenExpression
@@ -15,6 +15,7 @@ creating_structures = [
     (SyllogismExpression, syllogism_regex_complete),
     (WhenExpression, when_regex),
     (ConnectedExpression, connected_regex),
+    (BaseExpression, None),
 ]
 
 def create_expression(hypothesis):
@@ -25,18 +26,20 @@ def create_expression(hypothesis):
     # We go over each element in the creating structure and check for the regular expression
     # We only want full matches
     for constructor, expression_regex in creating_structures:
-        regex_match = re.match(expression_regex, lower, re.IGNORECASE)
-        if regex_match and regex_match.end() == len(lower):
+        regex_match = None
+        if expression_regex is not None:
+            regex_match = re.match(expression_regex, lower, re.IGNORECASE)
+        if expression_regex is None or (regex_match and regex_match.end() == len(lower)):
             try:
                 expression = constructor(lower)
                 return expression
             except Exception as err:
-                error_list.append(err)
-    try:
-        expression = BaseExpression(lower)
-        return expression
-    except Exception as err:
-        error_list.append(err)
+                if type(err) is ParseException:
+                    error_list += err.exception_list
+                else:
+                    error_list.append(str(err))
+
+    if len(error_list) != 0:
         raise ParseException(error_list)
 
 
@@ -45,7 +48,7 @@ def create_expression_representation(expression, ret_list = None):
         ret_list = dict()
 
     ret_list["list"] = []
-    if expression.negated:
+    if expression.negated and type(expression) != FunctionExpression:
         ret_list["list"].append(dict(
             type = -1,
             tokens = expression.negated
@@ -107,7 +110,7 @@ def create_expression_representation(expression, ret_list = None):
         return ret_list
     elif type(expression) == FunctionExpression:
         ret_list['type'] = 6
-        ret_list['name'] = f"{'F' if not expression.multi else 'Multif'}unction Expression"
+        ret_list['name'] = f"{'F' if not expression.multi else 'Multif'}unction Expression{'*' if expression.negated else ''}"
         ret_list["list"].append(dict(
             type = -6,
             name = "Variable",

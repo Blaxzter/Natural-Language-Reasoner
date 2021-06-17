@@ -2,7 +2,7 @@ import re
 
 from logics.Constants import separator, when_keywords, when_split_tokens, when_left_regex, when_right_regex
 from logics.senteces.Expression import Expression
-from logics.senteces.ParseException import ParseException
+from logics.senteces.ParseExceptions import ParseException
 from utils.Utils import tokenize, get_sentences_key_words
 
 

@@ -3,6 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Natural Language Prover</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
+            crossorigin="anonymous"></script>
+
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -12,20 +19,14 @@
     <script src="//d3js.org/d3.v5.min.js"></script>
     <script src="https://unpkg.com/@hpcc-js/wasm@0.3.11/dist/index.min.js"></script>
     <script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
-            crossorigin="anonymous"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"
             integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <link rel="icon" href="../favicon.ico" type="image/x-icon"/>
     <style>
-        @import url("//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css");
-
         html {
             height: 100%
         }
@@ -54,7 +55,7 @@
 
         .heading {
             font-family: 'Dancing Script', cursive;
-            font-size: 6.5rem;
+            font-size: 4.5rem;
             text-align: center;
             margin-bottom: 3rem;
         }
@@ -81,16 +82,17 @@
                 <h1 class="heading">Natural Language Reasoner</h1>
             </header>
 
-            <ul class="nav nav-pills nav-fill pb-5" id="tab" role="tablist">
+            <ul class="nav nav-pills nav-fill pb-3" id="tab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active border" id="reasoner-tab" v-on:click="change_page('reasoner')"
-                            type="button"
+                    <button class="nav-link border" id="reasoner-tab" v-on:click="change_page('reasoner')"
+                            type="button" data-bs-toggle="tab" data-bs-target="#reasoner"
                             role="tab" aria-controls="reasoner" aria-selected="false">
                         Reasoner
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link border" id="language-tab" v-on:click="change_page('language')" type="button"
+                    <button class="nav-link border" id="language-tab" v-on:click="change_page('language')"
+                            type="button" data-bs-toggle="tab" data-bs-target="#language"
                             role="tab" aria-controls="language" aria-selected="false">
                         Language Check
                     </button>
@@ -98,7 +100,7 @@
             </ul>
 
             <div class="tab-content" id="pills-tabContent">
-                <div class="tab-pane show" id="reasoner" role="tabpanel" aria-labelledby="reasoner-tab">
+                <div class="tab-pane" id="reasoner" role="tabpanel" aria-labelledby="reasoner-tab">
                     <ul class="nav nav-tabs" role="tablist">
                         <li class="nav-item" v-for="tab in tabs" :class="{ dropdown: tab.examples.length >= 1}"
                             role="presentation">
@@ -119,8 +121,8 @@
                         </li>
                     </ul>
 
-                    <fieldset name="form" class="list-group p-5 border-end border-bottom border-start tab-content">
-                        <div v-for="(item, index) in expressions" class="expression_input pb-3">
+                    <fieldset name="form" class="list-group p-4 border-end border-bottom border-start tab-content">
+                        <div v-for="(item, index) in expressions" class="expression_input pb-1">
                             <label class="form-label">{{index + 1}}. input:</label>
                             <input type="text" v-model:value="item.value" placeholder="Next Expression"
                                    class="form-control"/>
@@ -142,8 +144,8 @@
 
                     <div v-if="response" class="card my-4"
                          :class="{'bg-success': tree_closes, 'bg-danger': !tree_closes}">
-                        <h2 v-if="tree_closes" class="display-5 text-center">The statement is valid.</h2>
-                        <h2 v-if="!tree_closes" class="display-5 text-center">There is a branch that doesn't close.</h2>
+                        <h2 v-if="tree_closes" class="display-5 text-center">The statement is valid</h2>
+                        <h2 v-if="!tree_closes" class="display-5 text-center">There is a branch that doesn't close</h2>
                     </div>
 
                     <div class="card applied_rules my-4" v-if="applied_rules.length != 0">
@@ -160,7 +162,8 @@
                         </div>
                         <div id="accordion" class="accordion collapse">
                             <div class="accordion-item" v-for="(rule, index) in applied_rules">
-                                <div class="accordion-header" v-bind:id="'heading_' + index" v-if="index != 'root_node'">
+                                <div class="accordion-header" v-bind:id="'heading_' + index"
+                                     v-if="index != 'root_node'">
 
                                     <button class="accordion-button" type="button" data-bs-toggle="collapse"
                                             v-bind:data-bs-target="'#collapse-' + index">
@@ -214,20 +217,63 @@
                         Here you can check out what our constrained natural language is able to parse and
                         provides you with feedback how it went.
                     </p>
-                    <fieldset name="form" class="list-group p-5 border">
-                        <div class="mb-3">
-                            <span class="form-label">Test sentence:</span>
-                            <input type="text" placeholder="Next Expression" class="form-control pt-3"
-                                   v-model:value="sentence"/>
+
+                    <h5>Examples</h5>
+
+                    <div class="input-group mb-2">
+                        <div class="input-group-text">
+                            <input class="form-check-input mt-0" type="checkbox"
+                                   v-model:value="auto_send"
+                                   aria-label="Checkbox for automatically sending the language request">
+                        </div>
+                        <span class="form-control">When selecting a language example, automatically send the request to the server.</span>
+                    </div>
+
+                    <div class="accordion mb-4" id="language_examples_accordion">
+                        <div class="accordion-item" v-for="(group, group_index) in language_examples">
+                            <h3 class="accordion-header" :id="'group_heading_' + group_index">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        :data-bs-target="'#group_collapse_' + group_index" aria-expanded="true"
+                                        :aria-controls="'group_collapse_' + group_index">
+                                    {{group['group_name']}}
+                                </button>
+                            </h3>
+                            <div :id="'group_collapse_' + group_index" class="accordion-collapse collapse"
+                                 :aria-labelledby="'group_heading_' + group_index"
+                                 data-bs-parent="#language_examples_accordion">
+                                <div class="accordion-body">
+                                    <div class="d-flex flex-row justify-content-between flex-wrap">
+                                        <button type="button" class="btn m-1 text-nowrap flex-grow-1"
+                                                :class="{'btn-outline-success': sentence != language_example, 'btn-success': sentence == language_example}"
+                                                v-for="language_example in group['examples']"
+                                                v-on:click="select_language_example(language_example)">
+                                            {{language_example}}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <fieldset name="form" class="list-group border p-4">
+                        <div class="pb-3">
+                            <label class="w-100">
+                                <span class="form-label">Test sentence:</span>
+                                <input type="text" placeholder="Next Expression" class="form-control"
+                                       v-model:value="sentence"/>
+                            </label>
                         </div>
                         <button type="button" class="btn btn-primary" v-on:click="language_request"
-                                style="margin-top: 8px;">Check
+                                :class="{disabled: !sentence}">
+                            Check
                         </button>
                     </fieldset>
 
-                    <div class="container-fluid d-flex flex-row p-4 align-content-center">
+                    <div class="container-fluid p-4">
 
-                        <div v-html="create_sentence_presentation" style="position: absolute; left: 50%; transform: translateX(-50%);">
+                        <div v-html="create_sentence_presentation"
+                             v-if="!error"
+                             style="position: absolute; left: 50%; transform: translateX(-50%);">
                         </div>
                     </div>
                 </div>
@@ -235,17 +281,29 @@
 
             <div class="card bg-danger" v-if="error">
                 <div class="card-header">
-                    <span class="lead">
+                    <span class="lead" v-if="error.type == 'ParseException'">
+                        Parse Exception
+                    </span>
+                    <span class="lead" v-if="error.type != 'ParseException'">
                         Internal Error
                     </span>
                 </div>
                 <div class="card-body">
-                    <span class="lead">Oops something went wrong and we dont really know what.</span><br>
-                    <span class="lead">This could help tho: {{error.body}}</span>
+                    <div v-if="error.type != 'ParseException'">
+                        <span class="lead">Oops something went wrong and we dont really know what.</span><br>
+                        <span class="lead">This could help tho: {{error.error}}</span>
+                    </div>
+                    <div v-if="error.type == 'ParseException'">
+                        <span class="lead">We detected a error in the parsing process</span><br>
+                        <span class="lead">This are the errors we collected along the way:</span><br>
+                        <ul>
+                            <li v-for="c_error in error.list">{{c_error}}</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
-            <div v-if="response" style="height: calc(0.5 * 100vh)"></div>
+            <div v-if="response || language_output" style="height: calc(0.5 * 100vh)"></div>
             <div id="tooltip" class="card"
                  :style="{'display': tooltip_visible ? 'block' : 'none', 'top': topOffset, 'left': leftOffset}"
                  style="position: fixed">
@@ -316,7 +374,9 @@
             up: true,
             current_tab: 'Normal Examples',
             tabs: [],
+            language_examples: [],
             sentence: 'When i love you then you love me',
+            auto_send: true,
             language_output: '',
             tooltip_header: "",
             in_expressions: "",
@@ -333,6 +393,8 @@
                 router.push("reasoner")
             if (window.location.hash === "#/language")
                 this.change_page("language")
+            else
+                this.change_page("reasoner")
 
             window.onmousemove = (e) => {
                 if (this.tooltip_visible) {
@@ -344,11 +406,16 @@
             };
 
             axios
-                .get('/examples')
+                .get('/examples?name=reasoner_examples.json')
                 .then(response => {
-                    console.log(response['data'])
                     this.tabs = response['data']
                     this.change_tab(this.tabs[0], -1)
+                })
+            axios
+                .get('/examples?name=language_examples.json')
+                .then(response => {
+                    this.language_examples = response['data']
+                    this.sentence = this.language_examples[0]["examples"][0]
                 })
         },
         computed: {
@@ -363,23 +430,26 @@
             },
         },
         methods: {
+
+            select_language_example(example){
+                this.sentence = example
+                if (this.auto_send) {
+                    this.language_request()
+                }
+            },
             change_page(to_page) {
                 let reasoner_panel = document.getElementById("reasoner")
                 let language_panel = document.getElementById("language")
                 let reasoner_panel_tab = document.getElementById("reasoner-tab")
                 let language_panel_tab = document.getElementById("language-tab")
-                reasoner_panel.classList.remove("show");
-                language_panel.classList.remove("show");
-                reasoner_panel_tab.classList.remove("active");
-                language_panel_tab.classList.remove("active");
 
                 if (to_page === "reasoner") {
-                    reasoner_panel.classList.add("show");
                     reasoner_panel_tab.classList.add("active");
+                    reasoner_panel.classList.add("active");
                     router.push("reasoner")
                 } else {
-                    language_panel.classList.add("show");
                     language_panel_tab.classList.add("active");
+                    language_panel.classList.add("active");
                     router.push("language")
                 }
             },
@@ -413,7 +483,7 @@
                     this.language_output = response.body;
                 }, response => {
                     // error callback
-                    this.error = response
+                    this.error = JSON.parse(response.bodyText.replaceAll("'",'"'))
                 });
             },
             send_request() {
@@ -440,7 +510,7 @@
                     this.display_tree(response.body['dot_graph'])
                 }, response => {
                     // error callback
-                    this.error = response
+                    this.error = JSON.parse(response.bodyText.replaceAll("'",'"'))
                 });
             },
             toggle_tooltip(element, enter) {
@@ -474,7 +544,8 @@
                             };
                         }
                     })
-                    .renderDot(dot_graph);
+                    .renderDot(dot_graph)
+                    .resetZoom();
             },
             get_color(type) {
                 let color = "#a5363b"
@@ -512,11 +583,11 @@
                 c_type = sentence_part['type']
 
                 let ret_html = "<div " +
-                    "class=\"p-2 m-2 rounded align-middle\" " +
+                    "class=\"p-1 m-1 rounded align-middle d-flex flex-column align-content-center\" " +
                     "style=\"background-color: " + this.get_color(c_type) +
                     "; border: 3px solid " + this.get_border_color(c_type) + "\">\n"
                 ret_html += "<h4 class='flex-row' style='margin: 0.25em 0.25em 0 0.25em'>" + sentence_part['name'] + "</h4>"
-                ret_html += "<div class='flex-row d-inline-flex'>"
+                ret_html += "<div class='d-flex flex-row d-inline-flex justify-content-center'>"
                 if (sentence_part['tokens'])
                     ret_html += "<span class=\"text-center text-nowrap\"><strong>" + sentence_part['tokens'] + "</strong></span>"
                 for (let i = 0; i < sentence_part['list'].length; i++) {
@@ -525,17 +596,18 @@
                         ret_html += this.recursive_sentence_structure(current_sentence_part)
                     } else {
                         let cs_type = current_sentence_part['type'];
-                        ret_html += "<div class=\"p-2 m-2 rounded align-middle\" " +
+                        ret_html += "<div class=\"p-1 m-1 rounded align-middle\" " +
                             "style=\"background-color: " + this.get_color(cs_type) +
                             "; display: flex; justify-content: center; flex-direction: column; " +
                             "border: 2px solid " + this.get_border_color(cs_type) + "\">\n"
                         if (cs_type === -1)
-                            ret_html += "<span class=\"text-center\">¬</span>"
-                        else
+                            ret_html += "<span class=\"text-center\"><strong>¬</strong></span>"
+                        else {
                             if (current_sentence_part['name'])
                                 ret_html += "<span class=\"text-center text-nowrap\">" + current_sentence_part['name'] + "</span>"
-                        if (current_sentence_part['tokens'])
-                            ret_html += "<span class=\"text-center text-nowrap\"><strong>" + current_sentence_part['tokens'] + "</strong></span>"
+                            if (current_sentence_part['tokens'])
+                                ret_html += "<span class=\"text-center text-nowrap\"><strong>" + current_sentence_part['tokens'] + "</strong></span>"
+                        }
                         ret_html += "</div>"
                     }
                 }
