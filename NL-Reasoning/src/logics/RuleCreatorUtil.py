@@ -1,5 +1,8 @@
+"""
+Small utils class that removes bulcks of code from the Tableaux solver
+It just creates applied rules depending on what rule is required.
+"""
 from visualization.AppliedRule import AppliedRule
-
 
 def create_root_node_rule():
     return AppliedRule(

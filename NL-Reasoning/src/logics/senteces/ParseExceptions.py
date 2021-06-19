@@ -1,6 +1,8 @@
 
 class ParseException(Exception):
-
+    """
+    New exception for the sentence parsing
+    """
     def __init__(self, *args):
 
         if type(args[0]) == list:

@@ -1,3 +1,10 @@
+"""
+This file is where the magic happens
+All the constants and regex expressions are defined
+
+I explain every line as every variable is quite self explanatory
+"""
+
 match_types = ["optional", "once", "at_least_once"]
 
 def or_reg(keyword_list, match_type = "once"):
@@ -5,7 +12,7 @@ def or_reg(keyword_list, match_type = "once"):
     Function that given a keyword list creates the regex or operator
     :param keyword_list: The keyword list
     :param match_type: If the operator is required or optional
-    :return:
+    :return: (keyword_1|keyword_2)match_type
     """
 
     sorted_by_length = sorted(keyword_list, key = len, reverse = True)

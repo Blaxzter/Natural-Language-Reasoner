@@ -1,5 +1,13 @@
 [
   {
+    "group_name": "Base Expressions",
+    "examples": [
+      "Peter must have eaten",
+      "The chair is furniture",
+      "Peter plays football"
+    ]
+  },
+  {
     "group_name": "Simple Examples",
     "examples": [
       "When i eat pizza, then you eat pizza"

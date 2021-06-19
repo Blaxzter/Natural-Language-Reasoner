@@ -1,3 +1,6 @@
+"""
+Data class that just encapsulates the applied rule
+"""
 from dataclasses import dataclass, field
 from typing import Dict, List
 
@@ -14,6 +17,10 @@ class AppliedRule:
     rule_desc_obj: Dict = field(default = None, compare = False, hash = False)
 
     def get_dict(self):
+        """
+        Return a dictionary of this applied rule
+        :return: The dict representing the rule
+        """
         return dict(
             rule_name = self.rule_name,
             referenced_line = self.referenced_line,

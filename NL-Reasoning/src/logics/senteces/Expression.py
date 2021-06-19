@@ -7,13 +7,17 @@ import abc
 
 
 class Expression(metaclass=abc.ABCMeta):
-    id_counter = 0
+    """
+    Expression that is a abstract class of which each expression has to be parent of
+    """
+    id_counter = 0      # The expression counter for each new expression
 
     def __init__(self, hypothesis):
-
+        # We just want strings or lists (tokens) nothing else
         if hypothesis is None or (type(hypothesis) is not str and type(hypothesis) is not list):
             raise ParseException("A hypothesis needs to be of type string or token list and can't be empty.")
 
+        # Get the new id
         self.count_id()
 
         if type(hypothesis) is str:
@@ -23,21 +27,25 @@ class Expression(metaclass=abc.ABCMeta):
             self.init_hypo = " ".join(hypothesis)
             self.tokens = hypothesis
 
+        # If the "It is not the case that ..." is used remove it from the tokens
         self.negated = False
         if complete_negation in self.init_hypo:
             self.negated = True
             self.tokens = self.tokens[6:]
 
+        # Get the a plays b or c -> a plays b or a plays c
         self.split_references()
 
     def count_id(self):
+        """
+        Creat a new id
+        """
         self.id = Expression.id_counter
         Expression.id_counter += 1
 
     def split_references(self):
         """
         Splits the sentence that references previous subjects into multiple base tokens
-        :return:
         """
         for reference in connection_keywords:
             if reference in self.tokens:

@@ -4,6 +4,10 @@ from logics.senteces.Helper import create_expression
 
 
 class NaturalTableauxSolver:
+    """
+    Wrapper class for the tableaux solver that parses the
+    expressions and calls the solver
+    """
 
     def __init__(self, clauses, to_be_shown):
         Expression.id_counter = 0

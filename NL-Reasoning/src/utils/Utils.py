@@ -2,6 +2,12 @@ import inflect
 
 
 def create_new_object(list_of_new_objects, ref_object = None):
+    """
+    Function that creates the new object based on the new object list
+    :param list_of_new_objects: The previously created new objects
+    :param ref_object:          If a reference object is used take that as a name origin
+    :return: The new object
+    """
 
     if len(list_of_new_objects) == 0 and ref_object is None:
         list_of_new_objects.append("There")
@@ -16,6 +22,12 @@ def create_new_object(list_of_new_objects, ref_object = None):
 
 
 def get_sentences_key_words(reg_match, sentence):
+    """
+    Function that goes over the matches of a regex and gets the found keywords and sentences in between
+    :param reg_match: The regex match
+    :param sentence:  The sentence
+    :return: sentences, keywords
+    """
     # Filter unnecessary group matches
     reg_groups = list(filter(
         lambda x: not ((x[0] == 0 and x[1] == len(sentence)) or (x[0] == -1 and x[1] == -1)),
@@ -25,6 +37,7 @@ def get_sentences_key_words(reg_match, sentence):
     sentences = []
     key_words = []
     c_index = 0
+    # Go over each match
     for group_match in reg_groups:
         l_idx, r_idx = group_match
         curr_sentence = sentence[l_idx:r_idx].strip()
@@ -37,6 +50,12 @@ def get_sentences_key_words(reg_match, sentence):
 
 
 def single_tokens(sentence_tokens):
+    """
+    Transforms words in the token list into thier homonogenes self
+    :param sentence_tokens:
+    :return:
+    """
+    # Get the inflect engine
     single = inflect.engine()
     single_tokens = []
     for i, token in enumerate(sentence_tokens):
@@ -49,6 +68,12 @@ def single_tokens(sentence_tokens):
 
 
 def list_eq_check(element_list, comp_str):
+    """
+    Check whether a str is in the element list
+    :param element_list: The list that is checked
+    :param comp_str:     The str to be searched for
+    :return: The element if found otherwise None
+    """
     for element in element_list:
         if element == comp_str:
             return element
@@ -56,6 +81,12 @@ def list_eq_check(element_list, comp_str):
 
 
 def list_in_check(element_list, comp_list):
+    """
+    Check whether a element is in the comp list
+    :param element_list: The list that is checked
+    :param comp_str:     The comp_list to be searched for
+    :return: The element if found otherwise None
+    """
     for element in element_list:
         if element in comp_list:
             return element
@@ -63,6 +94,11 @@ def list_in_check(element_list, comp_list):
 
 
 def tokenize(sentence: str):
+    """
+    Tokenizer of the sentence
+    :param sentence: The input sentence
+    :return: The tokenized sentence
+    """
     tokens = sentence.split(" ")
     ret_tokens = []
     for i, token in enumerate(tokens):
@@ -89,51 +125,4 @@ def tokenize(sentence: str):
             ret_tokens.append(token)
     ret_tokens = single_tokens(ret_tokens)
     return ret_tokens
-
-
-def detect_sentence_structure(sentence_tokens):
-    if sentence_tokens is None or type(sentence_tokens) is not list or len(sentence_tokens) == 0:
-        raise ValueError("Sentence structure detection only works for token lists. "
-                         "And the token list is not empty")
-
-    # TODO support multiple sentence base structures
-    # does not play vs plays not ...
-    # TODO maybe we need to do a bit more elaborate approach besides the length
-
-    # Basic structure: A is B
-    if len(sentence_tokens) == 3 and sentence_tokens[1] == "is":
-        return 1
-
-    # Basic structure: A does B
-    if len(sentence_tokens) == 3:
-        return 2
-
-    # Inverted basic structure: A is not B
-    if len(sentence_tokens) == 4 and sentence_tokens[1] == "is":
-        return 3
-
-    # Inverted basic structure: A does not B
-    # Split because maybe we want to check: A does not do B or doesn't
-    if len(sentence_tokens) == 4:
-        return 4
-
-    raise ValueError(f'Sentence structure is not detected: {str(sentence_tokens)}')
-
-def swap_exclamation_marks(sentence_tokens):
-    if '(' in sentence_tokens:
-        sentence_tokens.remove('(')
-    if ')' in sentence_tokens:
-        sentence_tokens.remove(')')
-    if '!' in sentence_tokens:
-        sentence_tokens.remove('!')
-
-    sentence_type = detect_sentence_structure(sentence_tokens)
-
-    if sentence_type == 1 or 2:
-        sentence_tokens.insert(2, "not")
-    elif sentence_type == 2 or 4:
-        sentence_tokens.remove("not")
-
-    return sentence_tokens
-
 

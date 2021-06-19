@@ -1,3 +1,7 @@
+"""
+File containing the boilerplate pyramid server
+"""
+
 import os
 import json
 import traceback
@@ -13,6 +17,11 @@ from logics.senteces.ParseExceptions import ParseException
 
 
 def get_main_page(request):
+    """
+    Get the root file main page
+    :param request: The request
+    :return: The response containing the WebInterface
+    """
     print(request)
     here = os.path.dirname(os.path.abspath(__file__))
     response = FileResponse(
@@ -24,6 +33,9 @@ def get_main_page(request):
 
 
 def get_file(request):
+    """
+    Function for the data sets that returns the data sets as files
+    """
     print(request)
     here = os.path.dirname(os.path.abspath(__file__))
     response = FileResponse(
@@ -35,6 +47,11 @@ def get_file(request):
 
 
 def get_language_request(request: Request):
+    """
+    Handels the language parse request
+    :param request: The request
+    :return: The parse setnece or an exception
+    """
     request = json.loads(request.body.decode("utf-8"))
     sentence = request['sentence']
 
@@ -48,7 +65,7 @@ def get_language_request(request: Request):
         traceback.print_exc()
         response = Response(str(dict(
             type = type(err).__name__,
-            list = None if type(err) is not ParseException else err.exception_list,
+            list = "null" if type(err) is not ParseException else err.exception_list,
             error = str(err)
         )))
         response.status_int = 500
@@ -74,7 +91,7 @@ def get_solve_request(request: Request):
         traceback.print_exc()
         response = Response(str(dict(
             type = type(err).__name__,
-            list = None if type(err) is not ParseException else err.exception_list,
+            list = "null" if type(err) is not ParseException else err.exception_list,
             error = str(err)
         )))
         response.status_int = 500

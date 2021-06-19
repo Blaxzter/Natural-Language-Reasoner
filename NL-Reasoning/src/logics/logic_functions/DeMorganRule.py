@@ -13,7 +13,7 @@ class DeMorganRule(Rule):
         self.resulting_expression_1 = resulting_expression_1
         self.resulting_expression_2 = resulting_expression_2
 
-    def get_explanation(self, applied_rule):
+    def get_explanation(self):
         return dict(
             name=self.name,
             description=self.description,

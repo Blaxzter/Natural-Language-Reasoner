@@ -1,3 +1,6 @@
+"""
+File that loads all the examples in the syllogism data set and returns
+"""
 import json
 import pandas as pd
 
