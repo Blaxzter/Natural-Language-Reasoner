@@ -15,7 +15,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.2"></script>
-    <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+    <script src="https://unpkg.com/vue-router@3.5.2/dist/vue-router.js"></script>
     <script src="//d3js.org/d3.v5.min.js"></script>
     <script src="https://unpkg.com/@hpcc-js/wasm@0.3.11/dist/index.min.js"></script>
     <script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js"></script>
@@ -387,6 +387,7 @@
             tooltip_visible: false,
             topOffset: "0px",
             leftOffset: "0px",
+            graph_rendered: false,
         },
         mounted() {
             if (window.location.hash === "#/" || window.location.hash === "/")
@@ -483,7 +484,7 @@
                     this.language_output = response.body;
                 }, response => {
                     // error callback
-                    this.error = JSON.parse(response.bodyText.replaceAll("'",'"'))
+                    this.error = JSON.parse(response.bodyText.replaceAll("\"",'`').replaceAll("'",'"'))
                 });
             },
             send_request() {
@@ -503,19 +504,19 @@
                         applied_rule = this.applied_rules[applied_rule_idx]
                         if (applied_rule.created_expressions) {
                             console.log(applied_rule.created_expressions.replaceAll("'", '"'))
-                            applied_rule.created_expressions = JSON.parse(applied_rule.created_expressions.replaceAll("'", '"'))
+                            applied_rule.created_expressions = JSON.parse(applied_rule.created_expressions.replaceAll("\"",'`').replaceAll("'", '"'))
                         }
                     }
 
                     this.display_tree(response.body['dot_graph'])
                 }, response => {
                     // error callback
-                    this.error = JSON.parse(response.bodyText.replaceAll("'",'"'))
+                    this.error = JSON.parse(response.bodyText.replaceAll("\"",'`').replaceAll("'",'"'))
                 });
             },
             toggle_tooltip(element, enter) {
                 c_rule = this.applied_rules[element[0].id]['rule_desc_obj']
-                rule_object = JSON.parse(c_rule.replaceAll("'", '"'))
+                rule_object = JSON.parse(c_rule.replaceAll("\"",'`').replaceAll("'", '"'))
 
                 this.tooltip_header = rule_object['name']
                 this.in_expressions = rule_object['in_expression']
@@ -527,10 +528,12 @@
                 this.tooltip_visible = enter
             },
             display_tree(dot_graph) {
+                if (this.graph_rendered)
+                    d3.select("#graph").graphviz({useWorker: false}).resetZoom();
                 d3.select("#graph")
                     .graphviz({useWorker: false})
                     .on("renderEnd", () => {
-                        console.log("Render End")
+                        this.graph_rendered = true
                         var nodes = d3.selectAll(".node");
                         for (let i = 0; i < nodes._groups[0].length; i++) {
                             c_node = nodes._groups[0][i]
@@ -544,8 +547,8 @@
                             };
                         }
                     })
-                    .renderDot(dot_graph)
-                    .resetZoom();
+                    .renderDot(dot_graph);
+
             },
             get_color(type) {
                 let color = "#a5363b"

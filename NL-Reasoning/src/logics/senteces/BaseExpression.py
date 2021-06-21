@@ -74,15 +74,29 @@ class BaseExpression(Expression):
             self.verb = args[3]
             self.object = args[4]
 
-            self.tokenize_expression()
+        self.tokenize_expression()
 
     def tokenize_expression(self):
         """
         Create the tokens of the expression based on detected elements
         """
-        self.tokens = tokenize(
-            f'{self.subject} {self.verb}{" " + self.negation_word + " " if self.negated else " "}{self.object}'
-        )
+        if self.negated:
+            if type(self.negation_word) == list:
+                self.tokens = tokenize(
+                    f'{self.subject} {separator.join(self.negation_word)} {self.verb} {self.object}'
+                )
+            elif 'do' in self.negation_word:
+                self.tokens = tokenize(
+                    f'{self.subject} {self.negation_word} {self.verb} {self.object}'
+                )
+            else:
+                self.tokens = tokenize(
+                    f'{self.subject} {self.verb} {self.negation_word} {self.object}'
+                )
+        else:
+            self.tokens = tokenize(
+                f'{self.subject} {self.verb} {self.object}'
+            )
 
     def reverse_expression(self):
         """
@@ -161,7 +175,7 @@ class BaseExpression(Expression):
         Splice the subject, verb and object together with the negation word
         :return: The string representation of the expression
         """
-        return f'{self.subject} {self.verb}{" " + self.negation_word + " " if self.negated else " "}{self.object}'
+        return separator.join(self.tokens)
 
     def copy(self):
         """
