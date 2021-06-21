@@ -44,7 +44,7 @@ class OrRule(Rule):
         if type(clause) is not ConnectedExpression:
             return new_clauses, None
 
-        if clause.negated is True or clause.connection_keyword != 'or':
+        if clause.negated is True or clause.connection_keyword != 'or' or clause.connection_keyword != 'nor':
             return new_clauses, None
 
         # Copy the left and right expressions and add them to separate branches
