@@ -19,6 +19,7 @@ creating_structures = [
     (BaseExpression, None),
 ]
 
+
 def create_expression(hypothesis):
     """
     Function that creates the expressions given a sentence
@@ -119,7 +120,21 @@ def create_expression_representation(expression, ret_dict = None):
     elif type(expression) == BaseExpression:
         ret_dict['type'] = 5
         ret_dict['name'] = "Basis Information"
-        ret_dict['tokens'] = separator.join(expression.tokens)
+        ret_dict["list"].append(dict(
+            type = -5,
+            name = "Subject",
+            tokens = expression.subject,
+        ))
+        ret_dict["list"].append(dict(
+            type = -5,
+            name = "Verb",
+            tokens = expression.verb
+        ))
+        ret_dict["list"].append(dict(
+            type = -5,
+            name = "Object",
+            tokens = expression.object
+        ))
         return ret_dict
     elif type(expression) == FunctionExpression:
         ret_dict['type'] = 6

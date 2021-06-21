@@ -1,4 +1,6 @@
 from collections import defaultdict
+
+from logics.Constants import or_connection_keywords
 from logics.logic_functions.Rule import Rule
 from logics.senteces.ConnectedExpression import ConnectedExpression
 
@@ -44,7 +46,7 @@ class OrRule(Rule):
         if type(clause) is not ConnectedExpression:
             return new_clauses, None
 
-        if clause.negated is True or clause.connection_keyword != 'or' or clause.connection_keyword != 'nor':
+        if clause.negated is True or clause.connection_keyword not in or_connection_keywords:
             return new_clauses, None
 
         # Copy the left and right expressions and add them to separate branches

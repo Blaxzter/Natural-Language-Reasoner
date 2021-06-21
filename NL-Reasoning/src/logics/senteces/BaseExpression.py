@@ -2,7 +2,7 @@ from logics.Constants import negation_keywords, separator, base_filler_words
 from logics.senteces.Expression import Expression
 from logics.senteces.ParseExceptions import ParseException
 from logics.senteces.UnifiableVariable import UnifiableVariable
-from utils.Utils import tokenize, create_new_object
+from utils.Utils import tokenize, create_new_object, check_if_list_in_list
 
 
 class BaseExpression(Expression):
@@ -20,14 +20,23 @@ class BaseExpression(Expression):
             # Get whether the sentence is negated
             self.negation_word = 'not'
             for negation_keyword in negation_keywords:
-                if negation_keyword in self.tokens:
+                if type(negation_keyword) == list:
+                    found_index = check_if_list_in_list(negation_keyword, self.tokens)
+                    if found_index is not None:
+                        self.negation_word = negation_keyword
+                        self.negated = True
+                        break
+                elif negation_keyword in self.tokens:
                     self.negated = True
                     self.negation_word = negation_keyword
                     break
 
             # Remove the negation keyword
             if self.negated:
-                self.tokens.remove(self.negation_word)
+                if type(self.negation_word) == list:
+                    del self.tokens[found_index: found_index + len(self.negation_word)]
+                else:
+                    self.tokens.remove(self.negation_word)
 
             # Go over all possible filler words and add them to the allowed list
             extra_allowed = 0

@@ -48,6 +48,7 @@ def get_sentences_key_words(reg_match, sentence):
     sentences.append(sentence[c_index:])
     return sentences, key_words
 
+exception_tokens = ['is', 'chess', 'poisonous', 'does', 'has']
 
 def single_tokens(sentence_tokens):
     """
@@ -60,7 +61,7 @@ def single_tokens(sentence_tokens):
     single_tokens = []
     for i, token in enumerate(sentence_tokens):
         token_single = single.singular_noun(token)
-        if token_single != False and token != 'is' and token != 'chess' and token != 'poisonous':
+        if token_single != False and token not in exception_tokens:
             single_tokens.append(token_single)
         else:
             single_tokens.append(token)
@@ -92,6 +93,29 @@ def list_in_check(element_list, comp_list):
             return element
     return None
 
+
+def check_if_list_in_list(check_list, reference_list):
+    """
+    We search whether the check list occures in the reference list
+    :param check_list:      The list to be searched for in the reference list
+    :param reference_list:  The reference list
+    :return: True when the list is in the list otherwise false.
+    """
+    search_index = 0
+    while True:
+        if check_list[0] in reference_list[search_index:]:
+            first_index = reference_list[search_index:].index(check_list[0])
+            found = True
+            for i, tokens in enumerate(check_list[1:]):
+                if reference_list[search_index:][first_index + (i + 1)] != tokens:
+                    found = False
+                    break
+            if found:
+                return search_index + first_index
+            else:
+                search_index = first_index + 1
+        else:
+            return None
 
 def tokenize(sentence: str):
     """

@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+from logics.Constants import and_connection_keywords
 from logics.logic_functions.Rule import Rule
 from logics.senteces.ConnectedExpression import ConnectedExpression
 
@@ -45,7 +46,7 @@ class AndRule(Rule):
         if type(clause) is not ConnectedExpression:
             return new_clauses, None
 
-        if clause.negated or clause.connection_keyword != 'and':
+        if clause.negated or clause.connection_keyword not in and_connection_keywords:
             return new_clauses, None
 
         # Copy the left and right expressions and add them to the first branch

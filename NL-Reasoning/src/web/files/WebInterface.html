@@ -583,11 +583,11 @@
                 c_type = sentence_part['type']
 
                 let ret_html = "<div " +
-                    "class=\"p-1 m-1 rounded align-middle d-flex flex-column align-content-center\" " +
+                    "class=\"p-1 m-1 rounded align-middle d-flex flex-column align-content-center justify-content-center\" " +
                     "style=\"background-color: " + this.get_color(c_type) +
                     "; border: 3px solid " + this.get_border_color(c_type) + "\">\n"
                 ret_html += "<h4 class='flex-row' style='margin: 0.25em 0.25em 0 0.25em'>" + sentence_part['name'] + "</h4>"
-                ret_html += "<div class='d-flex flex-row d-inline-flex justify-content-center'>"
+                ret_html += "<div class='d-flex flex-row d-inline-flex align-content-center justify-content-center'>"
                 if (sentence_part['tokens'])
                     ret_html += "<span class=\"text-center text-nowrap\"><strong>" + sentence_part['tokens'] + "</strong></span>"
                 for (let i = 0; i < sentence_part['list'].length; i++) {

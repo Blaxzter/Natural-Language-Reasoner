@@ -39,10 +39,12 @@ base_regex = f"({complete_negation} )?"
 
 separator = ' '
 
-negation_keywords = ['not', 'never']
+negation_keywords = [ ['do', 'not'], ['does', 'not'], 'not', 'never', 'dont', 'don\'t', 'doesnt', 'doesn\'t']
 base_filler_words = ['the', 'must', 'a']
 
 connection_keywords = ['or', 'and', ';', 'nor']
+and_connection_keywords = ['and', ';']
+or_connection_keywords = ['or', 'nor']
 
 demoregen_regex = "Neither [a-zA-Z0-9 -]+ (nor|and|or) [a-zA-Z0-9 -]+"
 true_connected_regex = "[a-zA-Z0-9 -]+ (or|and|;) [a-zA-Z0-9 -]+"
