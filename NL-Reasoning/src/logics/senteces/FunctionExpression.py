@@ -126,7 +126,7 @@ class FunctionExpression(Expression):
         if type(clause) != FunctionExpression:
             return False, None
 
-        if self.negated == clause.negated:
+        if self.negated == clause.negated or self.multi != clause.multi:
             return False, None
 
         unification_replacements = []

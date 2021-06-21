@@ -53,7 +53,7 @@ class ConnectedExpression(Expression):
         Create the tokens of the expression based on detected elements
         """
         self.tokens = tokenize(
-            f'{de_morgen_expression if self.negated else ""}'
+            f'{de_morgen_expression if self.negated else ""} '
             f'{self.left_expression.get_string_rep()} {self.connection_keyword} {self.right_expression.get_string_rep()}'
         )
 
@@ -75,7 +75,7 @@ class ConnectedExpression(Expression):
         Splice expression back together with the negation word
         :return: The string representation of the expression
         """
-        return f'{"neither " if self.negated else ""}{separator.join(self.tokens)}'
+        return f'{separator.join(self.tokens)}'
 
     def reverse_expression(self):
         """
