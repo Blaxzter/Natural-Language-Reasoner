@@ -40,7 +40,7 @@ base_regex = f"({complete_negation} )?"
 separator = ' '
 
 negation_keywords = ['not', 'never']
-base_filler_words = ['the', 'must']
+base_filler_words = ['the', 'must', 'a']
 
 connection_keywords = ['or', 'and', ';', 'nor']
 
