@@ -9,13 +9,13 @@
             "value": "John plays football or chess"
           },
           {
-            "value": "When it is raining, John plays not football"
+            "value": "When it is raining, John does not play football"
           },
           {
             "value": "It is raining"
           }
         ],
-        "to_be_shown": "John plays not football"
+        "to_be_shown": "John does not play football"
       }
     ]
   },
@@ -38,10 +38,10 @@
         "name": "Negation",
         "expressions": [
           {
-            "value": "When neither I love him or you love him then he becomes sad"
+            "value": "When neither I love him nor you love him then he becomes sad"
           },
           {
-            "value": "I not love him and you not love him"
+            "value": "I do not love him and you do not love him"
           }
         ],
         "to_be_shown": "He becomes sad"
@@ -50,7 +50,7 @@
         "name": "Double Negation",
         "expressions": [
           {
-            "value": "When neither I not visit him or you not visit him then he becomes happy"
+            "value": "When neither I dont visit him nor you dont visit him then he becomes happy"
           },
           {
             "value": "I visit him and you visit him"
@@ -88,6 +88,18 @@
         "to_be_shown": "No kids are birds"
       },
       {
+        "name": "No-Some",
+        "expressions": [
+          {
+            "value": "No fishes are mammals"
+          },
+          {
+            "value": "Some mammals are aquatic animals"
+          }
+        ],
+        "to_be_shown": "Some aquatic animals are not fishes"
+      },
+      {
         "name": "Some-All",
         "expressions": [
           {
@@ -120,10 +132,13 @@
         "name": "Simple",
         "expressions": [
           {
-            "value": "for all frederics, frederics are cool"
+            "value": "for all cats, for all mouses, cats are bigger than mouses"
+          },
+          {
+            "value": "Tom is a cat and Jerry is a mouse"
           }
         ],
-        "to_be_shown": "Frederic is cool"
+        "to_be_shown": "Tom is bigger than Jerry"
       },
       {
         "name": "Multi Function",

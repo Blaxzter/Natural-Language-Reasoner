@@ -649,25 +649,25 @@
   },
   {
     "premise_1": "No fishes are mammals",
-    "premise_2": " Some mammals are aquatic",
+    "premise_2": " Some mammals are aquatic animals",
     "conclusion": "All aquatic animals are fishes",
     "valid": "invalid"
   },
   {
     "premise_1": "No fishes are mammals",
-    "premise_2": " Some mammals are aquatic",
+    "premise_2": " Some mammals are aquatic animals",
     "conclusion": "No aquatic animals are fishes",
     "valid": "invalid"
   },
   {
     "premise_1": "No fishes are mammals",
-    "premise_2": " Some mammals are aquatic",
+    "premise_2": " Some mammals are aquatic animals",
     "conclusion": "Some aquatic animals are fishes",
     "valid": "invalid"
   },
   {
     "premise_1": "No fishes are mammals",
-    "premise_2": " Some mammals are aquatic",
+    "premise_2": " Some mammals are aquatic animals",
     "conclusion": "Some aquatic animals are not fishes",
     "valid": "valid"
   },
@@ -1220,8 +1220,8 @@
   {
     "premise_1": "Some snakes are not venomous",
     "premise_2": "All snakes are reptiles",
-    "conclusion": "Some reptiles are not venomous",
-    "valid": "valid"
+    "conclusion": "Some reptiles are venomous",
+    "valid": "invalid"
   },
   {
     "premise_1": "Some drinks are not beer",

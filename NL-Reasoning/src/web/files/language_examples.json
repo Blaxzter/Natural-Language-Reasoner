@@ -12,13 +12,13 @@
   {
     "group_name": "Simple Examples",
     "examples": [
-      "When i eat pizza, then you eat pizza"
+      "When you visit me, then I eat pizza"
     ]
   },
   {
     "group_name": "Singlefunction Examples",
     "examples": [
-      "Charis are cool",
+      "Chairs are cool",
       "Chairs are not cool",
       "It is not the case that chairs are cool",
       "It is not the case that chairs are not cool"
