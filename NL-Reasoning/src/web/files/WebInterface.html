@@ -214,41 +214,61 @@
                 <div class="tab-pane" id="language" role="tabpanel" aria-labelledby="language-tab">
                     <h3>Language Check</h3>
                     <p>
-                        Here you can check out what our constrained natural language is able to parse and
-                        provides you with feedback how it went.
+                        Here you can check out what our constrained natural language is able to parse.
+                        You can either write your own sentences or checkout the examples that we provided.
                     </p>
 
-                    <h5>Examples</h5>
-
-                    <div class="input-group mb-2">
-                        <div class="input-group-text">
-                            <input class="form-check-input mt-0" type="checkbox"
-                                   v-model:value="auto_send"
-                                   aria-label="Checkbox for automatically sending the language request">
-                        </div>
-                        <span class="form-control">When selecting a language example, automatically send the request to the server.</span>
-                    </div>
-
-                    <div class="accordion mb-4" id="language_examples_accordion">
-                        <div class="accordion-item" v-for="(group, group_index) in language_examples">
-                            <h3 class="accordion-header" :id="'group_heading_' + group_index">
+                    <!-- This next part encapsulates the examples in an collapsable accordion -->
+                    <div class="accordion mb-4" id="accordionFlushExample">
+                        <div class="accordion-item">
+                            <h1 class="accordion-header" id="flush-headingOne">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                        :data-bs-target="'#group_collapse_' + group_index" aria-expanded="true"
-                                        :aria-controls="'group_collapse_' + group_index">
-                                    {{group['group_name']}}
+                                        data-bs-target="#flush-collapseOne" aria-expanded="false"
+                                        aria-controls="flush-collapseOne">
+                                    <span class="fs-3">
+                                        Examples
+                                    </span>
                                 </button>
-                            </h3>
-                            <div :id="'group_collapse_' + group_index" class="accordion-collapse collapse"
-                                 :aria-labelledby="'group_heading_' + group_index"
-                                 data-bs-parent="#language_examples_accordion">
+                            </h1>
+                            <div id="flush-collapseOne" class="accordion-collapse collapse"
+                                 aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
                                 <div class="accordion-body">
-                                    <div class="d-flex flex-row justify-content-between flex-wrap">
-                                        <button type="button" class="btn m-1 text-nowrap flex-grow-1"
-                                                :class="{'btn-outline-success': sentence != language_example, 'btn-success': sentence == language_example}"
-                                                v-for="language_example in group['examples']"
-                                                v-on:click="select_language_example(language_example)">
-                                            {{language_example}}
-                                        </button>
+                                    <div class="input-group mb-2">
+                                        <div class="input-group-text">
+                                            <input class="form-check-input mt-0" type="checkbox"
+                                                   v-model:value="auto_send"
+                                                   aria-label="Checkbox for automatically sending the language request">
+                                        </div>
+                                        <span class="form-control">When selecting a language example, automatically send the request to the server.</span>
+                                    </div>
+
+                                    <div class="accordion mb-4" id="language_examples_accordion">
+                                        <div class="accordion-item" v-for="(group, group_index) in language_examples">
+                                            <h3 class="accordion-header" :id="'group_heading_' + group_index">
+                                                <button class="accordion-button collapsed" type="button"
+                                                        data-bs-toggle="collapse"
+                                                        :data-bs-target="'#group_collapse_' + group_index"
+                                                        aria-expanded="true"
+                                                        :aria-controls="'group_collapse_' + group_index">
+                                                    {{group['group_name']}}
+                                                </button>
+                                            </h3>
+                                            <div :id="'group_collapse_' + group_index"
+                                                 class="accordion-collapse collapse"
+                                                 :aria-labelledby="'group_heading_' + group_index"
+                                                 data-bs-parent="#language_examples_accordion">
+                                                <div class="accordion-body">
+                                                    <div class="d-flex flex-row justify-content-between flex-wrap">
+                                                        <button type="button" class="btn m-1 text-nowrap flex-grow-1"
+                                                                :class="{'btn-outline-success': sentence != language_example, 'btn-success': sentence == language_example}"
+                                                                v-for="language_example in group['examples']"
+                                                                v-on:click="select_language_example(language_example)">
+                                                            {{language_example}}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -377,7 +397,7 @@
             language_examples: [],
             sentence: 'When i love you then you love me',
             auto_send: true,
-            language_output: '',
+            language_output: null,
             tooltip_header: "",
             in_expressions: "",
             out_expressions: "",
@@ -421,8 +441,7 @@
         },
         computed: {
             create_sentence_presentation() {
-                console.log("Test")
-                if (this.language_output === "")
+                if (this.language_output == null)
                     return "<div></div>"
 
                 let data_structure = this.recursive_sentence_structure(this.language_output);
@@ -432,7 +451,7 @@
         },
         methods: {
 
-            select_language_example(example){
+            select_language_example(example) {
                 this.sentence = example
                 if (this.auto_send) {
                     this.language_request()
@@ -484,7 +503,7 @@
                     this.language_output = response.body;
                 }, response => {
                     // error callback
-                    this.error = JSON.parse(response.bodyText.replaceAll("\"",'`').replaceAll("'",'"'))
+                    this.error = JSON.parse(response.bodyText.replaceAll("\"", '`').replaceAll("'", '"'))
                 });
             },
             send_request() {
@@ -504,19 +523,19 @@
                         applied_rule = this.applied_rules[applied_rule_idx]
                         if (applied_rule.created_expressions) {
                             console.log(applied_rule.created_expressions.replaceAll("'", '"'))
-                            applied_rule.created_expressions = JSON.parse(applied_rule.created_expressions.replaceAll("\"",'`').replaceAll("'", '"'))
+                            applied_rule.created_expressions = JSON.parse(applied_rule.created_expressions.replaceAll("\"", '`').replaceAll("'", '"'))
                         }
                     }
 
                     this.display_tree(response.body['dot_graph'])
                 }, response => {
                     // error callback
-                    this.error = JSON.parse(response.bodyText.replaceAll("\"",'`').replaceAll("'",'"'))
+                    this.error = JSON.parse(response.bodyText.replaceAll("\"", '`').replaceAll("'", '"'))
                 });
             },
             toggle_tooltip(element, enter) {
                 c_rule = this.applied_rules[element[0].id]['rule_desc_obj']
-                rule_object = JSON.parse(c_rule.replaceAll("\"",'`').replaceAll("'", '"'))
+                rule_object = JSON.parse(c_rule.replaceAll("\"", '`').replaceAll("'", '"'))
 
                 this.tooltip_header = rule_object['name']
                 this.in_expressions = rule_object['in_expression']
@@ -616,7 +635,7 @@
                 }
                 ret_html += "</div></div>\n"
                 return ret_html
-            }
+            },
         },
     })
 </script>

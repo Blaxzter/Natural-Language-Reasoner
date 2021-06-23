@@ -39,7 +39,7 @@ base_regex = f"({complete_negation} )?"
 
 separator = ' '
 
-negation_keywords = [ ['do', 'not'], ['does', 'not'], 'not', 'never', 'dont', 'don\'t', 'doesnt', 'doesn\'t']
+negation_keywords = [['do', 'not'], ['does', 'not'], 'not', 'never', 'dont', 'don\'t', 'doesnt', 'doesn\'t']
 base_filler_words = ['the', 'must', 'a']
 
 connection_keywords = ['or', 'and', ';', 'nor']
@@ -54,7 +54,7 @@ connected_regex = f"{base_regex}({demoregen_regex}|{true_connected_regex})"
 when_keywords = ['when', 'if']
 when_split_tokens = [',', 'then', ', then']
 when_split_right = ['because', ', because', 'if', ', if', ', because of']
-when_left_regex = f"{or_reg(when_keywords)} [a-zA-Z0-9 -]+{or_reg(when_split_tokens)} [a-zA-Z0-9 -]+"
+when_left_regex = f"{or_reg(when_keywords)} [a-zA-Z0-9 -]+{or_reg(when_split_tokens)} [a-zA-Z0-9, -]+"
 when_right_regex = f"[a-zA-Z0-9 -]+{or_reg(when_split_right)} [a-zA-Z0-9 -]+"
 when_regex = f"{base_regex}({when_left_regex}|{when_right_regex})"
 
