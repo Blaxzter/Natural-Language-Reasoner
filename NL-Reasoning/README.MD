@@ -3,6 +3,8 @@
 
 This project researches the task of reasoning with constrained natural language (CNL).
 
+You can find a working example on https://nl-reasoner.fabraham.dev/#/reasoner
+
 ## File Tree
 
 ```

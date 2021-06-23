@@ -12,7 +12,7 @@ class NaturalTableauxSolver:
     def __init__(self, clauses, to_be_shown):
         Expression.id_counter = 0
         self.expressions = [
-            create_expression(clause) for clause in clauses
+            create_expression(clause) for clause in clauses if len(clause) != 0
         ]
         self.to_be_shown = create_expression(to_be_shown)
 

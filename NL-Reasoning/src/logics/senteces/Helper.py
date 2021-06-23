@@ -64,14 +64,33 @@ def create_expression_representation(expression, ret_dict = None):
     ret_dict["list"] = []
     if expression.negated and type(expression) != FunctionExpression:
         ret_dict["list"].append(dict(
-            type = -1,
+            type = 0,
             tokens = expression.negated
         ))
 
     if type(expression) == SyllogismExpression:
         ret_dict['type'] = 1
         ret_dict['name'] = "Syllogism"
-        ret_dict['tokens'] = separator.join(expression.tokens)
+        ret_dict["list"].append(dict(
+            type = -1,
+            name = "1. Keyword",
+            tokens = expression.syllogism_keywords[0],
+        ))
+        ret_dict["list"].append(dict(
+            type = -1,
+            name = "Object",
+            tokens = expression.object
+        ))
+        ret_dict["list"].append(dict(
+            type = -1,
+            name = "2. Keyword",
+            tokens = expression.syllogism_keywords[1]
+        ))
+        ret_dict["list"].append(dict(
+            type = -1,
+            name = "Subject",
+            tokens = expression.subject
+        ))
         return ret_dict
     elif type(expression) == ConnectedExpression:
         ret_dict['type'] = 2

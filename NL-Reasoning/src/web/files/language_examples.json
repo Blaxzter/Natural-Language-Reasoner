@@ -12,13 +12,17 @@
   {
     "group_name": "Simple Examples",
     "examples": [
-      "When you visit me, then I eat pizza"
+      "When you visit me, then I eat pizza",
+      "You like pasta and i like pizza",
+      "neither You like pasta and i like pizza",
+      "It is not the case that neither You like pasta and i like pizza"
     ]
   },
   {
     "group_name": "Recursive Examples",
     "examples": [
-      "When neither you visit him nor I visit him then he becomes sad"
+      "When neither you visit him nor I visit him then he becomes sad",
+      "for all x, for all y, if x is a parent of y, then x is older than y"
     ]
   },
   {
@@ -37,6 +41,15 @@
       "Peter is not the father of Susi",
       "It is not the case that Peter is the father of Susi",
       "It is not the case that Peter is not the father of Susi"
+    ]
+  },
+  {
+    "group_name": "Syllogism Examples",
+    "examples": [
+      "all living persons are mortal",
+      "No real humans are birds",
+      "Some mammals are aquatic animals",
+      "Some snakes are not poisonous"
     ]
   }
 ]
