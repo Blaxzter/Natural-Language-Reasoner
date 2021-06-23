@@ -79,25 +79,25 @@
         "name": "No-All",
         "expressions": [
           {
-            "value": "No humans are birds"
+            "value": "No human is a bird"
           },
           {
             "value": "All kids are humans"
           }
         ],
-        "to_be_shown": "No kids are birds"
+        "to_be_shown": "No kid is a bird"
       },
       {
         "name": "No-Some",
         "expressions": [
           {
-            "value": "No fishes are mammals"
+            "value": "No fish is a mammal"
           },
           {
             "value": "Some mammals are aquatic animals"
           }
         ],
-        "to_be_shown": "Some aquatic animals are not fishes"
+        "to_be_shown": "Some aquatic animals are not fish"
       },
       {
         "name": "Some-All",

@@ -14,8 +14,8 @@
     "examples": [
       "When you visit me, then I eat pizza",
       "You like pasta and i like pizza",
-      "neither You like pasta and i like pizza",
-      "It is not the case that neither You like pasta and i like pizza"
+      "Neither you like pasta nor i like pizza",
+      "It is not the case that neither you like pasta nor i like pizza"
     ]
   },
   {
@@ -26,7 +26,7 @@
     ]
   },
   {
-    "group_name": "Singlefunction Examples",
+    "group_name": "Single Function Examples",
     "examples": [
       "Chairs are cool",
       "Chairs are not cool",
