@@ -48,7 +48,7 @@ def get_sentences_key_words(reg_match, sentence):
     sentences.append(sentence[c_index:])
     return sentences, key_words
 
-exception_tokens = ['is', 'chess', 'poisonous', 'does', 'has', 'mouse', 'mouses']
+exception_tokens = ['is', 'chess', 'poisonous', 'does', 'has']
 
 def single_tokens(sentence_tokens):
     """
@@ -61,6 +61,8 @@ def single_tokens(sentence_tokens):
     single_tokens = []
     for i, token in enumerate(sentence_tokens):
         token_single = single.singular_noun(token)
+        if token_single == 'mouses' or token_single == 'mou':
+            token_single = 'mouse'
         if token_single != False and token not in exception_tokens:
             single_tokens.append(token_single)
         else:
