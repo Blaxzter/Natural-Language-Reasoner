@@ -1,5 +1,7 @@
 # UM MAI 2 - Group 2 - Natural Language Reasoning
 
+Deployed version can be found here: https://nl-reasoner.fabraham.dev/
+
 ## Problem Statement and Research Questions
 
 In this project, we want to investigate the possibility of reasoning with a controlled natural language, and our aim is to build a reasoning tool, in the form of a webpage interface, that can perform logical reasoning tasks phrased in a controlled natural language, and also provide explanations for the conclusions it derives.
